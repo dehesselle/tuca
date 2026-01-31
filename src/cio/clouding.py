@@ -46,7 +46,7 @@ ValidStatusCodes = [
 class Clouding:
     def __init__(self):
         self.api_url = URL("https://api.clouding.io/v1")
-        self.api_auth = {"X-API-KEY": get_token()}
+        self.api_auth = {"X-API-KEY": get_token(None)}
         self._response = requests.Response()
         self.response = {}
 
@@ -54,7 +54,21 @@ class Clouding:
         print(json.dumps(self.response, indent=4, sort_keys=True))
 
     @property
-    def _verbose(self):
+    def is_ok(self) -> bool:
+        try:
+            if self._response.status_code in [
+                HTTPStatus.OK,
+                HTTPStatus.CREATED,
+                HTTPStatus.ACCEPTED,
+                HTTPStatus.NO_CONTENT,
+            ]:
+                return True
+        except:
+            pass
+        return False
+
+    @property
+    def _verbose(self) -> dict:
         if "verbose" not in self.response:
             self.response["verbose"] = {}
         return self.response["verbose"]

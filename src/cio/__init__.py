@@ -4,6 +4,7 @@ from enum import StrEnum, auto
 from cio.auth import delete_token, set_token
 from cio.config import config
 from cio.servers import Servers
+from cio.snapshots import Snapshots
 from cio.version import VERSION
 
 
@@ -11,6 +12,7 @@ class Component(StrEnum):
     AUTH = auto()
     LIMITS = auto()
     SERVERS = auto()
+    SNAPSHOTS = auto()
 
 
 class Action(StrEnum):
@@ -22,7 +24,12 @@ class Action(StrEnum):
 
 def list_servers(args):
     servers = Servers()
-    servers.list()
+    servers.list(args.id)
+
+
+def list_snapshots(args):
+    snpashots = Snapshots()
+    snpashots.list(args.id)
 
 
 def main() -> None:
@@ -51,8 +58,16 @@ def main() -> None:
     #     help="create servers",
     # )
     server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
-    server_action_list.add_argument("-n", "--name", default="", required=False)
+    server_action_list.add_argument("-i", "--id", default="", required=False)
     server_action_list.set_defaults(func=list_servers)
+
+    snapshots = components.add_parser(Component.SNAPSHOTS, help="manage snapshots")
+    snapshot_actions = snapshots.add_subparsers(help="available actions")
+    snapshot_action_list = snapshot_actions.add_parser(
+        Action.LIST, help="list snapshots"
+    )
+    snapshot_action_list.add_argument("-i", "--id", default="", required=False)
+    snapshot_action_list.set_defaults(func=list_snapshots)
 
     args = parser.parse_args()
     config.be_verbose = args.verbose

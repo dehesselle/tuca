@@ -57,7 +57,7 @@ class Clouding:
         self.api_auth = {"X-API-KEY": get_token(None)}
         self.endpoint = ""
         self.response = requests.Response()
-        self.header: ResponseHeader = None
+        self.response_header: ResponseHeader = None
 
     @property
     def is_status_ok(self) -> bool:
@@ -79,9 +79,9 @@ class Clouding:
 
     def _post_processing(self):
         if self.is_status_valid:
-            self.header = ResponseHeader.model_validate(self.response.headers)
+            self.response_header = ResponseHeader.model_validate(self.response.headers)
         else:
-            self.header = ResponseHeader()
+            self.response_header = ResponseHeader()
             # FIXME: rework error handling
             print("invalid HTTP status", self.response.status_code)
             exit(1)

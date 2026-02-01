@@ -70,7 +70,7 @@ class Components[T: Component]:
                 "endpoint": self.endpoint,
                 "status_code": self.clouding.response.status_code,
             }
-            result["verbose"].update(self.clouding.header.model_dump())
+            result["verbose"].update(self.clouding.response_header.model_dump())
 
         return json.dumps(
             result,

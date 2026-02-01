@@ -17,12 +17,22 @@ class Method(StrEnum):
 
     GET = auto()
     POST = auto()
+    DELETE = auto()
 
 
 class ResponseHeader(BaseModel):
     # rate_limit_limit: str = Field(alias="X-Rate-Limit-Limit", default="")
     rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining", default="")
     # rate_limit_reset: str = Field(alias="X-Rate-Limit-Reset", default="")
+
+
+class DeleteResponse(BaseModel):
+    id: str
+    status: str
+    startetAt: str
+    completedAt: str
+    resourceId: str
+    resourceType: str
 
 
 ValidStatusCodes = [
@@ -88,4 +98,10 @@ class Clouding:
         self.response = requests.post(
             self.api_url / endpoint, data=json.dumps(payload), headers=headers
         )
+        self._post_processing()
+
+    def delete(self, endpoint: str, headers: dict = {}):
+        self.endpoint = endpoint
+        headers.update(self.api_auth)
+        self.response = requests.delete(self.api_url / endpoint, headers=headers)
         self._post_processing()

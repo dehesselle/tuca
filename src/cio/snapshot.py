@@ -2,7 +2,7 @@ from cio.component import Component, Components
 
 
 class Snapshot(Component):
-    pass
+    createdAt: str
 
 
 class Snapshots(Components):

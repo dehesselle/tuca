@@ -3,12 +3,10 @@ from enum import StrEnum, auto
 from http import HTTPStatus
 
 import requests
+from pydantic import BaseModel, Field
 from urlpath import URL
 
 from cio.auth import get_token
-from cio.config import config
-
-API_URL = URL("https://api.clouding.io/v1")
 
 
 class Method(StrEnum):
@@ -18,13 +16,13 @@ class Method(StrEnum):
         return name.upper()
 
     GET = auto()
-    PUT = auto()
+    POST = auto()
 
 
-class HeaderField(StrEnum):
-    RATE_LIMIT_LIMIT = "X-Rate-Limit-Limit"
-    RATE_LIMIT_REMAINING = "X-Rate-Limit-Remaining"
-    RATE_LIMIT_RESET = "X-Rate-Limit-Reset"
+class ResponseHeader(BaseModel):
+    # rate_limit_limit: str = Field(alias="X-Rate-Limit-Limit", default="")
+    rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining", default="")
+    # rate_limit_reset: str = Field(alias="X-Rate-Limit-Reset", default="")
 
 
 ValidStatusCodes = [
@@ -47,16 +45,14 @@ class Clouding:
     def __init__(self):
         self.api_url = URL("https://api.clouding.io/v1")
         self.api_auth = {"X-API-KEY": get_token(None)}
-        self._response = requests.Response()
-        self.response = {}
-
-    def print(self):
-        print(json.dumps(self.response, indent=4, sort_keys=True))
+        self.endpoint = ""
+        self.response = requests.Response()
+        self.header: ResponseHeader = None
 
     @property
-    def is_ok(self) -> bool:
+    def is_status_ok(self) -> bool:
         try:
-            if self._response.status_code in [
+            if self.response.status_code in [
                 HTTPStatus.OK,
                 HTTPStatus.CREATED,
                 HTTPStatus.ACCEPTED,
@@ -68,36 +64,28 @@ class Clouding:
         return False
 
     @property
-    def _verbose(self) -> dict:
-        if "verbose" not in self.response:
-            self.response["verbose"] = {}
-        return self.response["verbose"]
+    def is_status_valid(self) -> bool:
+        return self.response.status_code in ValidStatusCodes
 
-    def request(self, method: Method, endpoint: str, headers: dict):
-        headers.update(self.api_auth)
-        self._response = requests.request(
-            method, self.api_url / endpoint, headers=headers
-        )
-        if config.be_verbose:
-            self._verbose.update(
-                {"endpoint": endpoint, "status_code": self._response.status_code}
-            )
-
-        if self._response.status_code in ValidStatusCodes:
-            if config.be_verbose:
-                self._verbose.update(
-                    {
-                        HeaderField.RATE_LIMIT_REMAINING: self._response.headers[
-                            HeaderField.RATE_LIMIT_REMAINING
-                        ]
-                    }
-                )
+    def _post_processing(self):
+        if self.is_status_valid:
+            self.header = ResponseHeader.model_validate(self.response.headers)
         else:
-            print("invalid HTTP status", self._response.status_code)
+            self.header = ResponseHeader()
+            # FIXME: rework error handling
+            print("invalid HTTP status", self.response.status_code)
             exit(1)
 
     def get(self, endpoint: str, headers: dict = {}):
-        self.request(Method.GET, endpoint, headers=headers)
+        self.endpoint = endpoint
+        headers.update(self.api_auth)
+        self.response = requests.get(self.api_url / endpoint, headers=headers)
+        self._post_processing()
 
-    def put(self, endpoint: str, headers: dict = {}):
-        self.request(Method.PUT, endpoint, headers=headers)
+    def post(self, endpoint: str, payload: dict, headers: dict = {}):
+        self.endpoint = endpoint
+        headers.update(self.api_auth)
+        self.response = requests.post(
+            self.api_url / endpoint, data=json.dumps(payload), headers=headers
+        )
+        self._post_processing()

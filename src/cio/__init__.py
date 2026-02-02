@@ -2,6 +2,7 @@ import argparse
 
 from cio.auth import setup_auth_cli
 from cio.config import config
+from cio.keypair import setup_keypairs_cli
 from cio.server import setup_servers_cli
 from cio.snapshot import setup_snapshots_cli
 from cio.version import VERSION
@@ -19,6 +20,7 @@ def main() -> None:
     parser.add_argument("--version", action="version", version=f"cio {VERSION}")
     components = parser.add_subparsers(help="manageable components", dest="component")
     setup_auth_cli(components)
+    setup_keypairs_cli(components)
     setup_servers_cli(components)
     setup_snapshots_cli(components)
 

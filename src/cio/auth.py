@@ -1,3 +1,4 @@
+import os
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 from getpass import getpass
@@ -21,7 +22,10 @@ def set_token(_) -> None:
 
 
 def get_token(_) -> str:
-    return keyring.get_password(SERVICENAME, USERNAME)
+    if api_token := os.getenv("CLOUDINGIO_API_TOKEN"):
+        return api_token
+    else:
+        return keyring.get_password(SERVICENAME, USERNAME)
 
 
 def delete_token(_) -> None:

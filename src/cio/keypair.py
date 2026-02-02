@@ -46,7 +46,8 @@ def delete_keypair(args):
         keypair_id = args.id
 
     if keypair_id:
-        keypairs.delete(keypair_id)
+        response = keypairs.delete(keypair_id)
+        print(keypairs.to_str(response))
         # TODO not checking anything
     else:
         print("not found - no delete")  # TODO

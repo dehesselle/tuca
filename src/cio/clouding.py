@@ -16,11 +16,10 @@ class ResponseHeader(BaseModel):
 
 class DeleteResponse(BaseModel):
     id: str
-    status: str
-    startetAt: str
-    completedAt: str
-    resourceId: str
-    resourceType: str
+    status: str = ""
+    startedAt: str = ""
+    resourceId: str = ""
+    resourceType: str = ""
 
 
 ValidStatusCodes = [
@@ -49,6 +48,7 @@ class Clouding:
         self.endpoint = ""
         self.response = requests.Response()
         self.response_header = ResponseHeader()
+        self.delete_response = DeleteResponse(id="")
 
     def get(self, endpoint: str, headers: dict = {}):
         self.endpoint = endpoint
@@ -64,29 +64,32 @@ class Clouding:
         )
         self._post_processing()
 
-    def delete(self, endpoint: str, headers: dict = {}):
+    def delete(self, endpoint: str, id: str, headers: dict = {}):
         self.endpoint = endpoint
         headers.update(self.api_auth)
-        self.response = requests.delete(self.api_url / endpoint, headers=headers)
+        self.response = requests.delete(self.api_url / endpoint / id, headers=headers)
+        if self.has_content:
+            self.delete_response = DeleteResponse.model_validate(self.response.json())
+        else:
+            self.delete_response.resourceId = id  # the only piece of info we got
         self._post_processing()
 
     @property
     def is_status_ok(self) -> bool:
-        try:
-            if self.response.status_code in [
-                HTTPStatus.OK,
-                HTTPStatus.CREATED,
-                HTTPStatus.ACCEPTED,
-                HTTPStatus.NO_CONTENT,
-            ]:
-                return True
-        except:
-            pass
-        return False
+        return self.response.status_code in [
+            HTTPStatus.OK,
+            HTTPStatus.CREATED,
+            HTTPStatus.ACCEPTED,
+            HTTPStatus.NO_CONTENT,
+        ]
 
     @property
     def is_status_valid(self) -> bool:
         return self.response.status_code in ValidStatusCodes
+
+    @property
+    def has_content(self) -> bool:
+        return self.is_status_ok and self.response.status_code != HTTPStatus.NO_CONTENT
 
     def _post_processing(self):
         if self.is_status_valid:

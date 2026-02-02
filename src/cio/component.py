@@ -2,7 +2,7 @@ import json
 
 from pydantic import BaseModel, ValidationError
 
-from .clouding import Clouding
+from .clouding import Clouding, DeleteResponse
 from .config import config
 
 
@@ -39,8 +39,9 @@ class Components[T: Component]:
         )
         return self._deserialize_response()
 
-    def delete(self, id: str):
-        self.clouding.delete(self.endpoint + f"/{id}")
+    def delete(self, id: str) -> DeleteResponse:
+        self.clouding.delete(self.endpoint, id)
+        return self.clouding.delete_response
 
     def get(self) -> list[T]:
         if not self._all:
@@ -60,12 +61,15 @@ class Components[T: Component]:
         except KeyError:
             return None
 
-    def to_str(self, components: list[T] | T | None = None) -> str:
-        if components is None:
-            components = self.get()
-        elif not isinstance(components, list):
-            components = [components]
-        result = {self.endpoint: [component.model_dump() for component in components]}
+    def to_str(self, models: list[BaseModel] | BaseModel | None = None) -> str:
+        list_name = self.endpoint
+        if models is None:
+            models = self.get()
+        elif not isinstance(models, list):
+            if isinstance(models, DeleteResponse):
+                list_name = "delete"
+            models = [models]
+        result = {list_name: [model.model_dump() for model in models]}
         if config.be_verbose:
             result["verbose"] = {
                 "endpoint": self.endpoint,

@@ -4,14 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from cio.component import Component, Components
+from cio.component import Component, Components, CreatePayload
 from cio.firewall import Firewalls
-
-
-class Server(Component):
-    createdAt: Optional[str] = ""
-    publicIp: Optional[str] = ""
-    status: str
 
 
 class Action(StrEnum):
@@ -38,13 +32,19 @@ class Volume(BaseModel):
     ssdGb: int
 
 
-class CreateServerPayload(BaseModel):
+class CreateServerPayload(CreatePayload):
     name: str
     hostname: str
     flavorId: str
     accessConfiguration: AccessConfiguration
     volume: Volume
-    publicPortFirewallIds: list
+    publicPortFirewallIds: list[str]
+
+
+class Server(Component):
+    createdAt: Optional[str] = ""
+    publicIp: Optional[str] = ""
+    status: str
 
 
 class Servers(Components[Server]):
@@ -83,14 +83,14 @@ def delete_server(args):
         if server := servers.get_by_name(args.name):
             server_id = server.id
         else:
-            server_id = 0
+            server_id = ""
     else:
         server_id = args.id
 
     if server_id:
-        servers.delete(server_id)
-        print("after delete")
-        print(servers.clouding.response.json())
+        response = servers.delete(server_id)
+        # TODO not checking anything
+        print(servers.to_str(response))
     else:
         print("not found - no delete")  # TODO
         exit(1)

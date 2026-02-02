@@ -102,8 +102,8 @@ class Components[T: Component]:
 
     @property
     def _by_id(self) -> dict[str, T]:
-        return {component.id: component for component in self._all}
+        return {component.id: component for component in self.get()}
 
     @property
     def _by_name(self) -> dict[str, T]:
-        return {component.name: component for component in self._all}
+        return {component.name: component for component in self.get()}

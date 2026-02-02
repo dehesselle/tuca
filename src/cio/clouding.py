@@ -1,5 +1,4 @@
 import json
-from enum import StrEnum, auto
 from http import HTTPStatus
 
 import requests
@@ -7,17 +6,6 @@ from pydantic import BaseModel, Field
 from urlpath import URL
 
 from cio.auth import get_token
-
-
-class Method(StrEnum):
-    # https://github.com/python/cpython/issues/115509#issuecomment-1946971056
-    @staticmethod
-    def _generate_next_value_(name, *args):
-        return name.upper()
-
-    GET = auto()
-    POST = auto()
-    DELETE = auto()
 
 
 class ResponseHeader(BaseModel):
@@ -49,6 +37,9 @@ ValidStatusCodes = [
     HTTPStatus.INTERNAL_SERVER_ERROR,
     HTTPStatus.SERVICE_UNAVAILABLE,
 ]  # https://api.clouding.io/docs/#section/Introduction/Responses
+
+
+# TODO: pagination
 
 
 class Clouding:

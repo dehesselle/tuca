@@ -1,7 +1,7 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from cio.component import Component, Components, CreatePayload
+from .component import Component, Components, CreatePayload
 
 
 class Action(StrEnum):

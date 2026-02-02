@@ -1,10 +1,8 @@
 import argparse
 
 from cio.auth import setup_auth_cli
+from cio.components import setup_keypairs_cli, setup_servers_cli, setup_snapshots_cli
 from cio.config import config
-from cio.keypair import setup_keypairs_cli
-from cio.server import setup_servers_cli
-from cio.snapshot import setup_snapshots_cli
 from cio.version import VERSION
 
 

@@ -1,4 +1,4 @@
-from cio.component import Component, Components
+from .component import Component, Components
 
 
 class Firewall(Component):

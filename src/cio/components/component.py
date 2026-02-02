@@ -2,8 +2,8 @@ import json
 
 from pydantic import BaseModel, ValidationError
 
-from .clouding import Clouding, DeleteResponse
-from .config import config
+from cio.clouding import Clouding, DeleteResponse
+from cio.config import config
 
 
 class Component(BaseModel):

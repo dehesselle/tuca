@@ -4,8 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from cio.component import Component, Components, CreatePayload
-from cio.firewall import Firewalls
+from .component import Component, Components, CreatePayload
+from .firewall import Firewalls
 
 
 class Action(StrEnum):

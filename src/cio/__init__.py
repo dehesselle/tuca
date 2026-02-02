@@ -4,7 +4,7 @@ from enum import StrEnum, auto
 from cio.auth import delete_token, set_token
 from cio.config import config
 from cio.firewall import Firewalls
-from cio.server import Servers, create_server, delete_server, list_servers
+from cio.server import Servers, create_server, delete_server, list_server
 from cio.snapshot import Snapshots
 from cio.version import VERSION
 
@@ -66,7 +66,7 @@ def main() -> None:
     # )
     server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
     server_action_list.add_argument("-i", "--id", type=str, default="", required=False)
-    server_action_list.set_defaults(func=list_servers)
+    server_action_list.set_defaults(func=list_server)
     server_action_create = server_actions.add_parser(
         Action.CREATE, help="create new server"
     )

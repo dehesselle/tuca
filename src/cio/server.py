@@ -44,42 +44,8 @@ class Servers(Components):
     def __init__(self):
         super().__init__(Server, "servers")
 
-    def create_from_snapshot(
-        self,
-        name: str,
-        snapshot: str,
-        flavor_id: str,
-        password: str,
-        firewall: str,
-        wait_until_active: bool = False,
-    ) -> str:
-        payload = CreateServerPayload(
-            name=name,
-            hostname=name,
-            flavorId=flavor_id,
-            accessConfiguration=AccessConfiguration(
-                sshKeyId=None, password=password, savePassword=True
-            ),
-            volume=Volume(
-                source="snapshot", id=snapshot, ssdGb=50
-            ),  # TODO: default size from snapshot
-            publicPortFirewallIds=[firewall],
-        )
 
-        return self.to_str(self.create(payload))
-
-        # # TODO: when request bad, the error is not printed because its not in the response
-        # self.clouding.post(
-        #     "servers",
-        #     payload.model_dump(),
-        #     headers={"Content-Type": "application/json"},
-        # )
-        # print(self.clouding.response.json())
-        # print("---------------")
-        # print(self.clouding.response.text)
-
-
-def list_servers(args):
+def list_server(args):
     servers = Servers()
     if args.id:
         try:
@@ -95,11 +61,21 @@ def create_server(args):
     if firewall := Firewalls().get_by_name(args.firewall):
         firewall_id = firewall.id
     if firewall_id:
-        servers = Servers()
-        result_str = servers.create_from_snapshot(
-            args.name, args.snapshot, args.flavorid, args.password, firewall_id
+        payload = CreateServerPayload(
+            name=args.name,
+            hostname=args.name,
+            flavorId=args.flavorid,
+            accessConfiguration=AccessConfiguration(
+                sshKeyId=None, password=args.password, savePassword=True
+            ),
+            volume=Volume(
+                source="snapshot", id=args.snapshot, ssdGb=50
+            ),  # TODO: default size from snapshot
+            publicPortFirewallIds=[firewall_id],
         )
-        print(result_str)
+        servers = Servers()
+        server = servers.create(payload)
+        print(servers.to_str(server))
     else:
         print("error no firewall_id")  # TODO
         exit(1)

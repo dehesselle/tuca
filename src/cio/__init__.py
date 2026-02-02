@@ -1,38 +1,10 @@
 import argparse
-from enum import StrEnum, auto
 
-from cio.auth import delete_token, set_token
+from cio.auth import setup_auth_cli
 from cio.config import config
-from cio.firewall import Firewalls
-from cio.server import Servers, create_server, delete_server, list_server
-from cio.snapshot import Snapshots
+from cio.server import setup_servers_cli
+from cio.snapshot import setup_snapshots_cli
 from cio.version import VERSION
-
-
-class Component(StrEnum):
-    AUTH = auto()
-    LIMITS = auto()
-    SERVERS = auto()
-    SNAPSHOTS = auto()
-
-
-class Action(StrEnum):
-    LIST = auto()
-    CREATE = auto()
-    SET = auto()
-    DELETE = auto()
-
-
-def list_snapshots(args):
-    snapshots = Snapshots()
-    if args.id:
-        if snapshot := snapshots.get_by_id(args.id):
-            print(snapshots.to_str(snapshot))
-        else:
-            # TODO error handling
-            exit(1)
-    else:
-        print(snapshots.all_as_str)
 
 
 def main() -> None:
@@ -46,54 +18,9 @@ def main() -> None:
     )
     parser.add_argument("--version", action="version", version=f"cio {VERSION}")
     components = parser.add_subparsers(help="manageable components", dest="component")
-
-    auth = components.add_parser(Component.AUTH, help="manage authentication token")
-    auth_actions = auth.add_subparsers()
-    auth_action_set = auth_actions.add_parser(
-        Action.SET, help="set authentication token"
-    )
-    auth_action_set.set_defaults(func=set_token)
-    auth_action_delete = auth_actions.add_parser(
-        Action.DELETE, help="delete authentication token"
-    )
-    auth_action_delete.set_defaults(func=delete_token)
-
-    servers = components.add_parser(Component.SERVERS, help="manage servers")
-    server_actions = servers.add_subparsers(help="available actions")
-    # server_action_create = server_actions.add_parser(
-    #     Action.CREATE,
-    #     help="create servers",
-    # )
-    server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
-    server_action_list.add_argument("-i", "--id", type=str, default="", required=False)
-    server_action_list.set_defaults(func=list_server)
-    server_action_create = server_actions.add_parser(
-        Action.CREATE, help="create new server"
-    )
-    server_action_create.add_argument("--name", type=str, required=True)
-    server_action_create.add_argument("--snapshot", type=str, required=True)
-    server_action_create.add_argument("--flavorid", type=str, required=True)
-    server_action_create.add_argument(
-        "--firewall", type=str, required=False, default="default"
-    )
-    server_action_create.add_argument("--password", type=str, required=True)
-    server_action_create.set_defaults(func=create_server)
-
-    server_action_delete = server_actions.add_parser(
-        Action.DELETE, help="delete a server"
-    )
-    id_or_name = server_action_delete.add_mutually_exclusive_group(required=True)
-    id_or_name.add_argument("--id", type=str, default="")
-    id_or_name.add_argument("--name", type=str, default="")
-    server_action_delete.set_defaults(func=delete_server)
-
-    snapshots = components.add_parser(Component.SNAPSHOTS, help="manage snapshots")
-    snapshot_actions = snapshots.add_subparsers(help="available actions")
-    snapshot_action_list = snapshot_actions.add_parser(
-        Action.LIST, help="list snapshots"
-    )
-    snapshot_action_list.add_argument("-i", "--id", default="", required=False)
-    snapshot_action_list.set_defaults(func=list_snapshots)
+    setup_auth_cli(components)
+    setup_servers_cli(components)
+    setup_snapshots_cli(components)
 
     args = parser.parse_args()
     config.be_verbose = args.verbose

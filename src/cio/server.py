@@ -1,4 +1,5 @@
-from enum import StrEnum
+from argparse import _SubParsersAction
+from enum import StrEnum, auto
 from typing import Optional
 
 from pydantic import BaseModel
@@ -11,6 +12,12 @@ class Server(Component):
     createdAt: Optional[str] = ""
     publicIp: Optional[str] = ""
     status: str
+
+
+class Action(StrEnum):
+    LIST = auto()
+    CREATE = auto()
+    DELETE = auto()
 
 
 class Status(StrEnum):
@@ -40,20 +47,9 @@ class CreateServerPayload(BaseModel):
     publicPortFirewallIds: list
 
 
-class Servers(Components):
+class Servers(Components[Server]):
     def __init__(self):
         super().__init__(Server, "servers")
-
-
-def list_server(args):
-    servers = Servers()
-    if args.id:
-        try:
-            print(servers.all_by_id[args.id].as_str)
-        except KeyError:
-            exit(1)
-    else:
-        print(servers.all_as_str)
 
 
 def create_server(args):
@@ -98,3 +94,40 @@ def delete_server(args):
     else:
         print("not found - no delete")  # TODO
         exit(1)
+
+
+def list_server(args):
+    servers = Servers()
+    if args.id:
+        print(servers.to_str(servers.get_by_id(args.id)))
+    else:
+        print(servers.to_str())
+
+
+def setup_servers_cli(subparser: _SubParsersAction):
+    servers = subparser.add_parser("servers", help="manage servers")
+    server_actions = servers.add_subparsers(help="available actions")
+
+    server_action_create = server_actions.add_parser(
+        Action.CREATE, help="create new server"
+    )
+    server_action_create.add_argument("--name", type=str, required=True)
+    server_action_create.add_argument("--snapshot", type=str, required=True)
+    server_action_create.add_argument("--flavorid", type=str, required=True)
+    server_action_create.add_argument(
+        "--firewall", type=str, required=False, default="default"
+    )
+    server_action_create.add_argument("--password", type=str, required=True)
+    server_action_create.set_defaults(func=create_server)
+
+    server_action_delete = server_actions.add_parser(
+        Action.DELETE, help="delete a server"
+    )
+    id_or_name = server_action_delete.add_mutually_exclusive_group(required=True)
+    id_or_name.add_argument("--id", type=str, default="")
+    id_or_name.add_argument("--name", type=str, default="")
+    server_action_delete.set_defaults(func=delete_server)
+
+    server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
+    server_action_list.add_argument("-i", "--id", type=str, default="", required=False)
+    server_action_list.set_defaults(func=list_server)

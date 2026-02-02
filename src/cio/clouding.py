@@ -57,7 +57,27 @@ class Clouding:
         self.api_auth = {"X-API-KEY": get_token(None)}
         self.endpoint = ""
         self.response = requests.Response()
-        self.response_header: ResponseHeader = None
+        self.response_header = ResponseHeader()
+
+    def get(self, endpoint: str, headers: dict = {}):
+        self.endpoint = endpoint
+        headers.update(self.api_auth)
+        self.response = requests.get(self.api_url / endpoint, headers=headers)
+        self._post_processing()
+
+    def post(self, endpoint: str, payload: dict, headers: dict = {}):
+        self.endpoint = endpoint
+        headers.update(self.api_auth)
+        self.response = requests.post(
+            self.api_url / endpoint, data=json.dumps(payload), headers=headers
+        )
+        self._post_processing()
+
+    def delete(self, endpoint: str, headers: dict = {}):
+        self.endpoint = endpoint
+        headers.update(self.api_auth)
+        self.response = requests.delete(self.api_url / endpoint, headers=headers)
+        self._post_processing()
 
     @property
     def is_status_ok(self) -> bool:
@@ -81,27 +101,7 @@ class Clouding:
         if self.is_status_valid:
             self.response_header = ResponseHeader.model_validate(self.response.headers)
         else:
-            self.response_header = ResponseHeader()
+            # self.response_header = ResponseHeader()
             # FIXME: rework error handling
             print("invalid HTTP status", self.response.status_code)
             exit(1)
-
-    def get(self, endpoint: str, headers: dict = {}):
-        self.endpoint = endpoint
-        headers.update(self.api_auth)
-        self.response = requests.get(self.api_url / endpoint, headers=headers)
-        self._post_processing()
-
-    def post(self, endpoint: str, payload: dict, headers: dict = {}):
-        self.endpoint = endpoint
-        headers.update(self.api_auth)
-        self.response = requests.post(
-            self.api_url / endpoint, data=json.dumps(payload), headers=headers
-        )
-        self._post_processing()
-
-    def delete(self, endpoint: str, headers: dict = {}):
-        self.endpoint = endpoint
-        headers.update(self.api_auth)
-        self.response = requests.delete(self.api_url / endpoint, headers=headers)
-        self._post_processing()

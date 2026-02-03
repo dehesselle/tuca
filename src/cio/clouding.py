@@ -10,7 +10,7 @@ from cio.auth import get_token
 
 class ResponseHeader(BaseModel):
     # rate_limit_limit: str = Field(alias="X-Rate-Limit-Limit", default="")
-    rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining", default="")
+    rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining")
     # rate_limit_reset: str = Field(alias="X-Rate-Limit-Reset", default="")
 
 
@@ -20,6 +20,15 @@ class DeleteResponse(BaseModel):
     startedAt: str = ""
     resourceId: str = ""
     resourceType: str = ""
+
+
+class ResponseLinks(BaseModel):
+    next: str | None
+    previous: str | None
+
+
+class ResponseMeta(BaseModel):
+    total: int
 
 
 ValidStatusCodes = [
@@ -38,22 +47,23 @@ ValidStatusCodes = [
 ]  # https://api.clouding.io/docs/#section/Introduction/Responses
 
 
-# TODO: pagination
-
-
 class Clouding:
     def __init__(self):
         self.api_url = URL("https://api.clouding.io/v1")
         self.api_auth = {"X-API-KEY": get_token(None)}
         self.endpoint = ""
+        self.query = ""
         self.response = requests.Response()
-        self.response_header = ResponseHeader()
+        self.response_header = ResponseHeader(**{"X-Rate-Limit-Remaining": ""})
+        self.response_links = ResponseLinks(next=None, previous=None)
+        self.response_meta = ResponseMeta(total=0)
         self.delete_response = DeleteResponse(id="")
 
-    def get(self, endpoint: str, headers: dict = {}):
+    def get(self, endpoint: str):
         self.endpoint = endpoint
-        headers.update(self.api_auth)
-        self.response = requests.get(self.api_url / endpoint, headers=headers)
+        self.response = requests.get(
+            self.api_url / endpoint / "?pageSize=100", headers=self.api_auth
+        )
         self._post_processing()
 
     def post(self, endpoint: str, payload: dict, headers: dict = {}):
@@ -64,15 +74,25 @@ class Clouding:
         )
         self._post_processing()
 
-    def delete(self, endpoint: str, id: str, headers: dict = {}):
+    def delete(self, endpoint: str, id: str):
         self.endpoint = endpoint
-        headers.update(self.api_auth)
-        self.response = requests.delete(self.api_url / endpoint / id, headers=headers)
+        self.response = requests.delete(
+            self.api_url / endpoint / id, headers=self.api_auth
+        )
         if self.has_content:
             self.delete_response = DeleteResponse.model_validate(self.response.json())
         else:
             self.delete_response.resourceId = id  # the only piece of info we got
         self._post_processing()
+
+    def next(self) -> bool:
+        if url := self.response_links.next:
+            print(self.response_links.next)
+            self.response = requests.get(url, headers=self.api_auth)
+            self._post_processing()
+            return True
+        else:
+            return False
 
     @property
     def is_status_ok(self) -> bool:
@@ -94,8 +114,16 @@ class Clouding:
     def _post_processing(self):
         if self.is_status_valid:
             self.response_header = ResponseHeader.model_validate(self.response.headers)
+            try:
+                self.response_links = ResponseLinks.model_validate(
+                    self.response.json()["links"]
+                )
+                self.response_meta = ResponseMeta.model_validate(
+                    self.response.json()["meta"]
+                )
+            except KeyError:
+                pass  # non-paginated responses don't have links and meta
         else:
-            # self.response_header = ResponseHeader()
             # FIXME: rework error handling
             print("invalid HTTP status", self.response.status_code)
             exit(1)

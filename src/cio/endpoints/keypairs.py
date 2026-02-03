@@ -13,6 +13,8 @@ class Action(StrEnum):
 
 
 class Keypair(Resource):
+    id: str
+    name: str
     fingerprint: str
 
 
@@ -64,7 +66,7 @@ def list_keypair(args):
         print(keypairs.to_str())
 
 
-def setup_keypairs_cli(subparser: _SubParsersAction):
+def setup_keypairs_endpoint(subparser: _SubParsersAction):
     snapshots = subparser.add_parser("keypairs", help="manage keypairs")
     keypair_actions = snapshots.add_subparsers(help="available actions")
 

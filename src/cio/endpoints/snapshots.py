@@ -11,6 +11,8 @@ class Action(StrEnum):
 
 
 class Snapshot(Resource):
+    id: str
+    name: str
     createdAt: str
 
 
@@ -27,7 +29,7 @@ def list_snapshot(args):
         print(snapshots.to_str())
 
 
-def setup_snapshots_cli(subparser: _SubParsersAction):
+def setup_snapshots_endpoint(subparser: _SubParsersAction):
     snapshots = subparser.add_parser("snapshots", help="manage snapshots")
     snapshot_actions = snapshots.add_subparsers(help="available actions")
     snapshot_action_list = snapshot_actions.add_parser(

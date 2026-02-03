@@ -4,7 +4,8 @@ from .endpoint import Endpoint
 
 
 class Firewall(Resource):
-    pass
+    id: str
+    name: str
 
 
 class Firewalls(Endpoint[Firewall]):

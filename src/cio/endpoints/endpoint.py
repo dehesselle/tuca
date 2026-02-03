@@ -14,7 +14,7 @@ class RequestPayload(BaseModel):
 class Endpoint[T: Resource]:
     def __init__(self, component_type: T, endpoint: str):
         self.clouding = Clouding()
-        self._all = []
+        self.resources: list[T] = []
         self.component_type = component_type
         self.endpoint = endpoint
         self.response_key = endpoint
@@ -32,10 +32,14 @@ class Endpoint[T: Resource]:
         return self.clouding.delete_response
 
     def get(self) -> list[T]:
-        if not self._all:
+        if not self.resources:
             self.clouding.get(self.endpoint)
-            self._all.extend(self._deserialize_response(self.response_key))
-        return self._all
+            self.resources.extend(self._deserialize_response(self.response_key))
+            while (
+                len(self.resources) < 100 and self.clouding.next()
+            ):  # TODO configurable limit?
+                self.resources.extend(self._deserialize_response(self.response_key))
+        return self.resources
 
     def get_by_id(self, id: str) -> T | None:
         try:
@@ -88,6 +92,7 @@ class Endpoint[T: Resource]:
                 print("keyerror")  # TODO
             except ValidationError:
                 print("validationerror")  # TODO
+                print(self.clouding.response.json()[key])
         else:
             print("server response error")  # TODO
         return result

@@ -4,8 +4,7 @@ from pydantic import BaseModel
 
 
 class Resource(BaseModel):
-    id: str
-    name: str
+    pass
 
     @property
     def as_str(self):

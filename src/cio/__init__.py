@@ -2,7 +2,12 @@ import argparse
 
 from cio.auth import setup_auth_cli
 from cio.config import config
-from cio.endpoints import setup_keypairs_cli, setup_servers_cli, setup_snapshots_cli
+from cio.endpoints import (
+    setup_keypairs_endpoint,
+    setup_servers_endpoint,
+    setup_sizes_endpoint,
+    setup_snapshots_endpoint,
+)
 from cio.version import VERSION
 
 
@@ -18,9 +23,10 @@ def main() -> None:
     parser.add_argument("--version", action="version", version=f"cio {VERSION}")
     components = parser.add_subparsers(help="manageable components", dest="component")
     setup_auth_cli(components)
-    setup_keypairs_cli(components)
-    setup_servers_cli(components)
-    setup_snapshots_cli(components)
+    setup_keypairs_endpoint(components)
+    setup_servers_endpoint(components)
+    setup_snapshots_endpoint(components)
+    setup_sizes_endpoint(components)
 
     args = parser.parse_args()
     config.be_verbose = args.verbose

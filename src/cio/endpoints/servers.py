@@ -1,6 +1,5 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -44,8 +43,10 @@ class CreateRequestPayload(RequestPayload):
 
 
 class Server(Resource):
-    createdAt: Optional[str] = ""
-    publicIp: Optional[str] = ""
+    id: str
+    name: str
+    createdAt: str
+    publicIp: str | None
     status: str
 
 
@@ -106,7 +107,7 @@ def list_server(args):
         print(servers.to_str())
 
 
-def setup_servers_cli(subparser: _SubParsersAction):
+def setup_servers_endpoint(subparser: _SubParsersAction):
     servers = subparser.add_parser("servers", help="manage servers")
     server_actions = servers.add_subparsers(help="available actions")
 

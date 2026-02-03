@@ -4,8 +4,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from .component import Component, Components, CreatePayload
-from .firewall import Firewalls
+from cio.resource import Resource
+
+from .endpoint import Endpoint, RequestPayload
+from .firewalls import Firewalls
 
 
 class Action(StrEnum):
@@ -32,7 +34,7 @@ class Volume(BaseModel):
     ssdGb: int
 
 
-class CreateServerPayload(CreatePayload):
+class CreateRequestPayload(RequestPayload):
     name: str
     hostname: str
     flavorId: str
@@ -41,13 +43,13 @@ class CreateServerPayload(CreatePayload):
     publicPortFirewallIds: list[str]
 
 
-class Server(Component):
+class Server(Resource):
     createdAt: Optional[str] = ""
     publicIp: Optional[str] = ""
     status: str
 
 
-class Servers(Components[Server]):
+class Servers(Endpoint[Server]):
     def __init__(self):
         super().__init__(Server, "servers")
 
@@ -57,7 +59,7 @@ def create_server(args):
     if firewall := Firewalls().get_by_name(args.firewall):
         firewall_id = firewall.id
     if firewall_id:
-        payload = CreateServerPayload(
+        payload = CreateRequestPayload(
             name=args.name,
             hostname=args.name,
             flavorId=args.flavorid,

@@ -1,7 +1,9 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from .component import Component, Components, CreatePayload
+from cio.resource import Resource
+
+from .endpoint import Endpoint, RequestPayload
 
 
 class Action(StrEnum):
@@ -10,24 +12,24 @@ class Action(StrEnum):
     LIST = auto()
 
 
-class Keypair(Component):
+class Keypair(Resource):
     fingerprint: str
 
 
-class Keypairs(Components):
+class Keypairs(Endpoint[Keypair]):
     def __init__(self):
         super().__init__(Keypair, "keypairs")
         self.response_key = "values"
 
 
-class CreateKeypairPayload(CreatePayload):
+class CreateRequestPayload(RequestPayload):
     name: str
     publicKey: str
     privateKey: str
 
 
 def create_keypair(args):
-    payload = CreateKeypairPayload(
+    payload = CreateRequestPayload(
         name=args.name, publicKey=args.publickey, privateKey=args.privatekey
     )
     keypairs = Keypairs()

@@ -4,26 +4,14 @@ from pydantic import BaseModel, ValidationError
 
 from cio.clouding import Clouding, DeleteResponse
 from cio.config import config
+from cio.resource import Resource
 
 
-class Component(BaseModel):
-    id: str
-    name: str
-
-    @property
-    def as_str(self):
-        return json.dumps(
-            self.model_dump(),
-            indent=4,
-            sort_keys=True,
-        )
-
-
-class CreatePayload(BaseModel):
+class RequestPayload(BaseModel):
     pass
 
 
-class Components[T: Component]:
+class Endpoint[T: Resource]:
     def __init__(self, component_type: T, endpoint: str):
         self.clouding = Clouding()
         self._all = []
@@ -31,7 +19,7 @@ class Components[T: Component]:
         self.endpoint = endpoint
         self.response_key = endpoint
 
-    def create(self, payload: CreatePayload) -> list[T]:
+    def create(self, payload: RequestPayload) -> list[T]:
         self.clouding.post(
             self.endpoint,
             payload.model_dump(),

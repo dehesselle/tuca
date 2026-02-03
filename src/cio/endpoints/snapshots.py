@@ -1,18 +1,20 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from .component import Component, Components
+from cio.resource import Resource
+
+from .endpoint import Endpoint
 
 
 class Action(StrEnum):
     LIST = auto()
 
 
-class Snapshot(Component):
+class Snapshot(Resource):
     createdAt: str
 
 
-class Snapshots(Components):
+class Snapshots(Endpoint[Snapshot]):
     def __init__(self):
         super().__init__(Snapshot, "snapshots")
 

@@ -7,6 +7,7 @@ from cio.resource import Resource
 
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
+from .sizes import Flavors
 
 
 class Action(StrEnum):
@@ -45,8 +46,8 @@ class CreateRequestPayload(RequestPayload):
 class Server(Resource):
     id: str
     name: str
-    createdAt: str
-    publicIp: str | None
+    createdAt: str = ""
+    publicIp: str | None = ""
     status: str
 
 
@@ -56,6 +57,10 @@ class Servers(Endpoint[Server]):
 
 
 def create_server(args):
+    if args.flavorid not in Flavors().all:
+        print(f"flavor not supported: {args.flavorid}")
+        exit(1)
+
     firewall_id = 0
     if firewall := Firewalls().get_by_name(args.firewall):
         firewall_id = firewall.id

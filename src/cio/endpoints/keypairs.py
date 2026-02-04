@@ -43,25 +43,6 @@ def create_keypair(args):
     print(keypairs.to_str(keypair))
 
 
-def delete_keypair(args):
-    keypairs = Keypairs()
-    if args.name:
-        if keypair := keypairs.get_by_name(args.name):
-            keypair_id = keypair.id
-        else:
-            keypair_id = ""
-    else:
-        keypair_id = args.id
-
-    if keypair_id:
-        response = keypairs.delete(keypair_id)
-        print(keypairs.to_str(response))
-        # TODO not checking anything
-    else:
-        print("not found - no delete")  # TODO
-        exit(1)
-
-
 def setup_keypairs_endpoint(subparser: _SubParsersAction):
     snapshots = subparser.add_parser("keypairs", help="manage keypairs")
     keypair_actions = snapshots.add_subparsers(help="available actions")
@@ -80,7 +61,7 @@ def setup_keypairs_endpoint(subparser: _SubParsersAction):
     id_or_name = keypair_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
-    keypair_action_delete.set_defaults(func=delete_keypair)
+    keypair_action_delete.set_defaults(func=Keypairs.delete_resource)
 
     keypair_action_list = keypair_actions.add_parser(Action.LIST, help="list keypairs")
     keypair_action_list.add_argument("-i", "--id", default="", required=False)

@@ -87,6 +87,25 @@ class Endpoint[T: Resource]:
         else:
             print(endpoint.to_str())
 
+    @classmethod
+    def delete_resource(cls, args: argparse.Namespace):
+        endpoint = cls()
+        if args.name:
+            if resource := endpoint.get_by_name(args.name):
+                resource_id = resource.id
+            else:
+                resource_id = ""
+        else:
+            resource_id = args.id
+
+        if resource_id:
+            response = endpoint.delete(resource_id)
+            # TODO not checking anything
+            print(endpoint.to_str(response))
+        else:
+            print(f"resource_id not found: {resource_id}")  # TODO
+            exit(1)
+
     def _deserialize_response(self, key: str = "") -> list[T]:
         result = []
         if self.clouding.is_status_ok:

@@ -27,20 +27,20 @@ class Keypairs(Endpoint[Keypair]):
         super().__init__(Keypair, "keypairs")
         self.response_key = "values"
 
+    @classmethod
+    def create_resource(cls, args):
+        payload = CreateRequestPayload(
+            name=args.name, publicKey=args.publickey, privateKey=args.privatekey
+        )
+        keypairs = Keypairs()
+        keypair = keypairs.create(payload)
+        print(keypairs.to_str(keypair))
+
 
 class CreateRequestPayload(RequestPayload):
     name: str
     publicKey: str
     privateKey: str
-
-
-def create_keypair(args):
-    payload = CreateRequestPayload(
-        name=args.name, publicKey=args.publickey, privateKey=args.privatekey
-    )
-    keypairs = Keypairs()
-    keypair = keypairs.create(payload)
-    print(keypairs.to_str(keypair))
 
 
 def setup_keypairs_endpoint(subparser: _SubParsersAction):
@@ -53,7 +53,7 @@ def setup_keypairs_endpoint(subparser: _SubParsersAction):
     keypair_action_create.add_argument("--name", type=str, required=True)
     keypair_action_create.add_argument("--publickey", type=str, required=True)
     keypair_action_create.add_argument("--privatekey", type=str, default="")
-    keypair_action_create.set_defaults(func=create_keypair)
+    keypair_action_create.set_defaults(func=Keypairs.create_resource)
 
     keypair_action_delete = keypair_actions.add_parser(
         Action.DELETE, help="delete a server"

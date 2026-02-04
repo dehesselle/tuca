@@ -61,58 +61,62 @@ class Servers(Endpoint[Server]):
     def __init__(self):
         super().__init__(Server, "servers")
 
-
-def create_server(args):
-    if args.flavorid not in Flavors().all:
-        print(f"flavor not supported: {args.flavorid}")
-        exit(1)
-
-    if args.snapshot:
-        if snapshot := Snapshots().get_by_id(args.snapshot):
-            volume = Volume(source="snapshot", id=args.snapshot, ssdGb=snapshot.sizeGb)
-        else:
-            print(f"snapshot not found: {args.snapshot}")
+    @classmethod
+    def create_resource(cls, args):
+        if args.flavorid not in Flavors().all:
+            print(f"flavor not supported: {args.flavorid}")
             exit(1)
-    elif args.image:
-        if image := Images().get_by_id(args.image):
-            volume = Volume(source="image", id=args.image, ssdGb=image.minimumSizeGb)
+
+        if args.snapshot:
+            if snapshot := Snapshots().get_by_id(args.snapshot):
+                volume = Volume(
+                    source="snapshot", id=args.snapshot, ssdGb=snapshot.sizeGb
+                )
+            else:
+                print(f"snapshot not found: {args.snapshot}")
+                exit(1)
+        elif args.image:
+            if image := Images().get_by_id(args.image):
+                volume = Volume(
+                    source="image", id=args.image, ssdGb=image.minimumSizeGb
+                )
+            else:
+                print(f"image not found: {args.image}")
+                exit(1)
         else:
-            print(f"image not found: {args.image}")
+            print("mandatory mutually exclusive option missing")
             exit(1)
-    else:
-        print("mandatory mutually exclusive option missing")
-        exit(1)
 
-    if args.password:
-        access_configuration = AccessConfiguration(
-            sshKeyId=None, password=args.password, savePassword=True
-        )
-    elif args.sshkey:
-        access_configuration = AccessConfiguration(
-            sshKeyId=args.sshkey, password=None, savePassword=False
-        )
-    else:
-        print("mandatory mutually exclusive option missing")
-        exit(1)
+        if args.password:
+            access_configuration = AccessConfiguration(
+                sshKeyId=None, password=args.password, savePassword=True
+            )
+        elif args.sshkey:
+            access_configuration = AccessConfiguration(
+                sshKeyId=args.sshkey, password=None, savePassword=False
+            )
+        else:
+            print("mandatory mutually exclusive option missing")
+            exit(1)
 
-    firewall_id = 0
-    if firewall := Firewalls().get_by_name(args.firewall):
-        firewall_id = firewall.id
-    if firewall_id:
-        payload = CreateRequestPayload(
-            name=args.name,
-            hostname=args.name,
-            flavorId=args.flavorid,
-            accessConfiguration=access_configuration,
-            volume=volume,
-            publicPortFirewallIds=[firewall_id],
-        )
-        servers = Servers()
-        server = servers.create(payload)
-        print(servers.to_str(server))
-    else:
-        print("error no firewall_id")  # TODO
-        exit(1)
+        firewall_id = 0
+        if firewall := Firewalls().get_by_name(args.firewall):
+            firewall_id = firewall.id
+        if firewall_id:
+            payload = CreateRequestPayload(
+                name=args.name,
+                hostname=args.name,
+                flavorId=args.flavorid,
+                accessConfiguration=access_configuration,
+                volume=volume,
+                publicPortFirewallIds=[firewall_id],
+            )
+            servers = Servers()
+            server = servers.create(payload)
+            print(servers.to_str(server))
+        else:
+            print("error no firewall_id")  # TODO
+            exit(1)
 
 
 def setup_servers_endpoint(subparser: _SubParsersAction):
@@ -135,7 +139,7 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
     )
     password_or_sshkey.add_argument("--password", type=str, default="")
     password_or_sshkey.add_argument("--sshkey", type=str, default="")
-    server_action_create.set_defaults(func=create_server)
+    server_action_create.set_defaults(func=Servers.create_resource)
 
     server_action_delete = server_actions.add_parser(
         Action.DELETE, help="delete a server"

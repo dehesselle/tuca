@@ -4,6 +4,7 @@ from enum import StrEnum, auto
 from cio.resource import Resource
 
 from .endpoint import Endpoint
+from .images import Image
 
 
 class Action(StrEnum):
@@ -14,6 +15,8 @@ class Snapshot(Resource):
     id: str
     name: str
     createdAt: str
+    sizeGb: int
+    image: Image
 
 
 class Snapshots(Endpoint[Snapshot]):
@@ -23,10 +26,7 @@ class Snapshots(Endpoint[Snapshot]):
 
 def list_snapshot(args):
     snapshots = Snapshots()
-    if args.id:
-        print(snapshots.to_str(snapshots.get_by_id(args.id)))
-    else:
-        print(snapshots.to_str())
+    print(snapshots.to_str())
 
 
 def setup_snapshots_endpoint(subparser: _SubParsersAction):
@@ -35,5 +35,4 @@ def setup_snapshots_endpoint(subparser: _SubParsersAction):
     snapshot_action_list = snapshot_actions.add_parser(
         Action.LIST, help="list snapshots"
     )
-    snapshot_action_list.add_argument("-i", "--id", default="", required=False)
     snapshot_action_list.set_defaults(func=list_snapshot)

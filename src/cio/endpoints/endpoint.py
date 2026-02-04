@@ -94,7 +94,7 @@ class Endpoint[T: Resource]:
                 print("validationerror")  # TODO
                 print(self.clouding.response.json()[key])
         else:
-            print("server response error")  # TODO
+            print(f"HTTP {self.clouding.response.status_code}")  # TODO
         return result
 
     @property

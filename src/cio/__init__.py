@@ -3,6 +3,7 @@ import argparse
 from cio.auth import setup_auth_cli
 from cio.config import config
 from cio.endpoints import (
+    setup_images_endpoint,
     setup_keypairs_endpoint,
     setup_servers_endpoint,
     setup_sizes_endpoint,
@@ -21,12 +22,13 @@ def main() -> None:
         help="make output verbose",
     )
     parser.add_argument("--version", action="version", version=f"cio {VERSION}")
-    components = parser.add_subparsers(help="manageable components", dest="component")
-    setup_auth_cli(components)
-    setup_keypairs_endpoint(components)
-    setup_servers_endpoint(components)
-    setup_snapshots_endpoint(components)
-    setup_sizes_endpoint(components)
+    endpoints = parser.add_subparsers(help="manageable endpoints", dest="endpoint")
+    setup_auth_cli(endpoints)
+    setup_images_endpoint(endpoints)
+    setup_keypairs_endpoint(endpoints)
+    setup_servers_endpoint(endpoints)
+    setup_snapshots_endpoint(endpoints)
+    setup_sizes_endpoint(endpoints)
 
     args = parser.parse_args()
     config.be_verbose = args.verbose

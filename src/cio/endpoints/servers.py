@@ -7,7 +7,9 @@ from cio.resource import Resource
 
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
+from .images import Images
 from .sizes import Flavors
+from .snapshots import Snapshots
 
 
 class Action(StrEnum):
@@ -24,7 +26,7 @@ class Status(StrEnum):
 
 class AccessConfiguration(BaseModel):
     sshKeyId: str | None
-    password: str
+    password: str | None
     savePassword: bool
 
 
@@ -61,6 +63,34 @@ def create_server(args):
         print(f"flavor not supported: {args.flavorid}")
         exit(1)
 
+    if args.snapshot:
+        if snapshot := Snapshots().get_by_id(args.snapshot):
+            volume = Volume(source="snapshot", id=args.snapshot, ssdGb=snapshot.sizeGb)
+        else:
+            print(f"snapshot not found: {args.snapshot}")
+            exit(1)
+    elif args.image:
+        if image := Images().get_by_id(args.image):
+            volume = Volume(source="image", id=args.image, ssdGb=image.minimumSizeGb)
+        else:
+            print(f"image not found: {args.image}")
+            exit(1)
+    else:
+        print("mandatory mutually exclusive option missing")
+        exit(1)
+
+    if args.password:
+        access_configuration = AccessConfiguration(
+            sshKeyId=None, password=args.password, savePassword=True
+        )
+    elif args.sshkey:
+        access_configuration = AccessConfiguration(
+            sshKeyId=args.sshkey, password=None, savePassword=False
+        )
+    else:
+        print("mandatory mutually exclusive option missing")
+        exit(1)
+
     firewall_id = 0
     if firewall := Firewalls().get_by_name(args.firewall):
         firewall_id = firewall.id
@@ -69,12 +99,8 @@ def create_server(args):
             name=args.name,
             hostname=args.name,
             flavorId=args.flavorid,
-            accessConfiguration=AccessConfiguration(
-                sshKeyId=None, password=args.password, savePassword=True
-            ),
-            volume=Volume(
-                source="snapshot", id=args.snapshot, ssdGb=50
-            ),  # TODO: default size from snapshot
+            accessConfiguration=access_configuration,
+            volume=volume,
             publicPortFirewallIds=[firewall_id],
         )
         servers = Servers()
@@ -120,12 +146,18 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
         Action.CREATE, help="create new server"
     )
     server_action_create.add_argument("--name", type=str, required=True)
-    server_action_create.add_argument("--snapshot", type=str, required=True)
+    image_or_snapshot = server_action_create.add_mutually_exclusive_group(required=True)
+    image_or_snapshot.add_argument("--snapshot", type=str, default="")
+    image_or_snapshot.add_argument("--image", type=str, default="")
     server_action_create.add_argument("--flavorid", type=str, required=True)
     server_action_create.add_argument(
         "--firewall", type=str, required=False, default="default"
     )
-    server_action_create.add_argument("--password", type=str, required=True)
+    password_or_sshkey = server_action_create.add_mutually_exclusive_group(
+        required=True
+    )
+    password_or_sshkey.add_argument("--password", type=str, default="")
+    password_or_sshkey.add_argument("--sshkey", type=str, default="")
     server_action_create.set_defaults(func=create_server)
 
     server_action_delete = server_actions.add_parser(

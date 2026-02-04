@@ -2,7 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import platform
+import signal
+import time
 from argparse import _SubParsersAction
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from enum import StrEnum, auto
 
 from pydantic import BaseModel
@@ -112,8 +116,25 @@ class Servers(Endpoint[Server]):
                 publicPortFirewallIds=[firewall_id],
             )
             servers = Servers()
-            server = servers.create(payload)
-            print(servers.to_str(server))
+            if server := servers.create(payload):
+                server_id = server[0].id
+                if args.wait:
+                    if platform.system() == "Windows":
+                        signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
+                    with ThreadPoolExecutor() as executor:
+
+                        def wait(id: str, status: Status, seconds: int) -> None:
+                            while Servers().get_by_id(id).status != status:
+                                time.sleep(seconds)
+
+                        future = executor.submit(wait, server_id, Status.ACTIVE, 30)
+                        try:
+                            future.result(timeout=300)
+                        except TimeoutError:
+                            future.cancel()
+                print(servers.to_str(Servers().get_by_id(server_id)))
+            else:
+                print("failed to create server")
         else:
             print("error no firewall_id")  # TODO
             exit(1)
@@ -139,6 +160,9 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
     )
     password_or_sshkey.add_argument("--password", type=str, default="")
     password_or_sshkey.add_argument("--sshkey", type=str, default="")
+    server_action_create.add_argument(
+        "--wait", action="store_true", default=False, help="wait until server is active"
+    )
     server_action_create.set_defaults(func=Servers.create_resource)
 
     server_action_delete = server_actions.add_parser(

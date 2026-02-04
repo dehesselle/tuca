@@ -28,15 +28,10 @@ class Snapshots(Endpoint[Snapshot]):
         super().__init__(Snapshot, "snapshots")
 
 
-def list_snapshot(args):
-    snapshots = Snapshots()
-    print(snapshots.to_str())
-
-
 def setup_snapshots_endpoint(subparser: _SubParsersAction):
     snapshots = subparser.add_parser("snapshots", help="manage snapshots")
     snapshot_actions = snapshots.add_subparsers(help="available actions")
     snapshot_action_list = snapshot_actions.add_parser(
         Action.LIST, help="list snapshots"
     )
-    snapshot_action_list.set_defaults(func=list_snapshot)
+    snapshot_action_list.set_defaults(func=Snapshots.list_resources)

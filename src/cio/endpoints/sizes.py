@@ -46,25 +46,17 @@ class Sizes(Endpoint[VolumeSize]):
         self.response_key = "volumeSizes"
 
 
-def list_volume_sizes(args):
-    print(Sizes().to_str())
-
-
-def list_flavors(args):
-    print(Flavors().to_str())
-
-
 def setup_sizes_endpoint(subparser: _SubParsersAction):
     volumesizes = subparser.add_parser("volumesizes", help="query volume sizes")
     volumesizes_actions = volumesizes.add_subparsers(help="available actions")
     volumesizes_action_list = volumesizes_actions.add_parser(
         Action.LIST, help="list volume sizes"
     )
-    volumesizes_action_list.set_defaults(func=list_volume_sizes)
+    volumesizes_action_list.set_defaults(func=Sizes.list_resources)
 
     flavors = subparser.add_parser("flavors", help="query cpu/memory combos")
     flavors_actions = flavors.add_subparsers(help="available actions")
     flavors_action_list = flavors_actions.add_parser(
         Action.LIST, help="list volume sizes"
     )
-    flavors_action_list.set_defaults(func=list_flavors)
+    flavors_action_list.set_defaults(func=Flavors.list_resources)

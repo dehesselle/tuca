@@ -134,14 +134,6 @@ def delete_server(args):
         exit(1)
 
 
-def list_server(args):
-    servers = Servers()
-    if args.id:
-        print(servers.to_str(servers.get_by_id(args.id)))
-    else:
-        print(servers.to_str())
-
-
 def setup_servers_endpoint(subparser: _SubParsersAction):
     servers = subparser.add_parser("servers", help="manage servers")
     server_actions = servers.add_subparsers(help="available actions")
@@ -174,4 +166,4 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
 
     server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
     server_action_list.add_argument("-i", "--id", type=str, default="", required=False)
-    server_action_list.set_defaults(func=list_server)
+    server_action_list.set_defaults(func=Servers.list_resources)

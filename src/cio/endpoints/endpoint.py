@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import argparse
 import json
 
 from pydantic import BaseModel, ValidationError
@@ -77,6 +78,14 @@ class Endpoint[T: Resource]:
             indent=4,
             sort_keys=True,
         )
+
+    @classmethod
+    def list_resources(cls, args: argparse.Namespace):
+        endpoint = cls()
+        if hasattr(args, "id") and args.id:
+            print(endpoint.to_str(endpoint.get_by_id(args.id)))
+        else:
+            print(endpoint.to_str())
 
     def _deserialize_response(self, key: str = "") -> list[T]:
         result = []

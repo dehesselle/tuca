@@ -62,14 +62,6 @@ def delete_keypair(args):
         exit(1)
 
 
-def list_keypair(args):
-    keypairs = Keypairs()
-    if args.id:
-        print(keypairs.to_str(keypairs.get_by_id(args.id)))
-    else:
-        print(keypairs.to_str())
-
-
 def setup_keypairs_endpoint(subparser: _SubParsersAction):
     snapshots = subparser.add_parser("keypairs", help="manage keypairs")
     keypair_actions = snapshots.add_subparsers(help="available actions")
@@ -92,4 +84,4 @@ def setup_keypairs_endpoint(subparser: _SubParsersAction):
 
     keypair_action_list = keypair_actions.add_parser(Action.LIST, help="list keypairs")
     keypair_action_list.add_argument("-i", "--id", default="", required=False)
-    keypair_action_list.set_defaults(func=list_keypair)
+    keypair_action_list.set_defaults(func=Keypairs.list_resources)

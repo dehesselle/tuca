@@ -33,13 +33,8 @@ class Images(Endpoint[Image]):
         super().__init__(Image, "images")
 
 
-def list_images(args):
-    images = Images()
-    print(images.to_str())
-
-
 def setup_images_endpoint(subparser: _SubParsersAction):
     images = subparser.add_parser("images", help="manage images")
     images_actions = images.add_subparsers(help="available actions")
     images_action_list = images_actions.add_parser(Action.LIST, help="list snapshots")
-    images_action_list.set_defaults(func=list_images)
+    images_action_list.set_defaults(func=Images.list_resources)

@@ -58,7 +58,7 @@ export CLOUDINGIO_API_TOKEN=my_secret_token
 Or, more securely, have cio write it into your desktop's keyring. The following command will give you an interactive prompt to do that.
 
 ```
-cio auth set
+cio auth create
 ```
 
 _And before you say anything, I'm aware that `auth` is not an endpoint._

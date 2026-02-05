@@ -1,8 +1,8 @@
 # tool using Clouding.io API
 
-This is an unofficial CLI tool that interacts with the Clouding.io's REST API. Its main goal is to provide a simple interface that I can use to create and destroy servers from shell scripts. Therefore it neither provides access to all available API endpoints nor to all available attributes and/or actions.
+This is an unofficial CLI that interacts with Clouding.io's REST API. Its main goal is to provide a simple interface that can be used to create and destroy servers from shell scripts. It neither provides access to all API endpoints nor to all attributes and/or actions.
 
-The project status is best described as "alpha" as things are still very much in motion and specifically tailored towards my usecase.
+The project status is best described as "alpha" as things are still very much in motion.
 
 ## Installation
 
@@ -14,7 +14,7 @@ uv tool install tuca
 
 ## Usage
 
-### the basics
+### The basics
 
 The CLI interface follows this pattern:
 
@@ -22,11 +22,14 @@ The CLI interface follows this pattern:
 tuca <endpoint> <action> [options]
 ```
 
-- `endpoint` is the same as in https://api.clouding.io/docs/
-- `action` is one of `create`, `list` and `delete`
-- `options` depend on `endpoint` and `action`, consult `--help` for details
+- `endpoint` is the same as in https://api.clouding.io/docs/  
+  💁 _Not all endpoints are supported!_
+- `action` is one of `create`, `list` and `delete`  
+  💁 _Supported actions depend on endpoint.!_
+- `options` depend on `endpoint` and `action`  
+  💁 _Consult `--help` for details!_
 
-`tuca` writes pretty-printed JSON (no colors) to `stdout`. It's both human-readable and intended to be piped into `jq` for non-interactive usage. The following example shows the available SSH keys (redacted values) in a freshly created account:
+`tuca` writes pretty-printed JSON (no colors) to `stdout`. It's human-readable and can be piped into `jq` for non-interactive usage. The following example shows the output from `list`ing the `keypairs` endpoint (values redacted):
 
 ```json
 {
@@ -44,20 +47,20 @@ The output is
 
 - always organized as list, even if the result count is 1 or 0
 - usually named after the endpoint
-- contains only a limited number attributes, but always `id` and `name`
-- limited to 100 entries
+- contains an opionated subset of the available attributes, but always `id` and `name`
+- limited to a maximum of 100 entries
 
-### authentication
+### Authentication
 
-Before showing you examples, you need to setup an API token first. You can do that via environment variable:
+First order of business is setting up an API token. You can do that via environment variable:
 
-```
+```bash
 export CLOUDINGIO_API_TOKEN=my_secret_token
 ```
 
 Or, more securely, have tuca write it into your desktop's keyring. The following command will give you an interactive prompt to do that.
 
-```
+```bash
 tuca auth create
 ```
 
@@ -65,9 +68,9 @@ _And before you say anything, I'm aware that `auth` is not an endpoint._
 
 If you provide both, the environment variable takes precendence.
 
-### here we go
+### Here we go
 
-Time to create your first server. First, pick an image.
+Time to create your first server. Pick an image.
 
 ```bash
 tuca images list

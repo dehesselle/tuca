@@ -84,6 +84,8 @@ class Endpoint[T: Resource]:
         endpoint = cls()
         if hasattr(args, "id") and args.id:
             print(endpoint.to_str(endpoint.get_by_id(args.id)))
+        elif hasattr(args, "name") and args.name:
+            print(endpoint.to_str(endpoint.get_by_name(args.name)))
         else:
             print(endpoint.to_str())
 

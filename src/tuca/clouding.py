@@ -66,7 +66,7 @@ class Clouding:
     def get(self, endpoint: str):
         self.endpoint = endpoint
         self.response = requests.get(
-            self.api_url / endpoint / "?pageSize=100", headers=self.api_auth
+            str(self.api_url / endpoint / "?pageSize=100"), headers=self.api_auth
         )
         self._post_processing()
 
@@ -74,14 +74,14 @@ class Clouding:
         self.endpoint = endpoint
         headers.update(self.api_auth)
         self.response = requests.post(
-            self.api_url / endpoint, data=json.dumps(payload), headers=headers
+            str(self.api_url / endpoint), data=json.dumps(payload), headers=headers
         )
         self._post_processing()
 
     def delete(self, endpoint: str, id: str):
         self.endpoint = endpoint
         self.response = requests.delete(
-            self.api_url / endpoint / id, headers=self.api_auth
+            str(self.api_url / endpoint / id), headers=self.api_auth
         )
         if self.has_content:
             self.delete_response = DeleteResponse.model_validate(self.response.json())

@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from enum import StrEnum, auto
 
 from pydantic import BaseModel
+from slugify import slugify
 
 from cio.resource import Resource
 
@@ -109,7 +110,7 @@ class Servers(Endpoint[Server]):
         if firewall_id:
             payload = CreateRequestPayload(
                 name=args.name,
-                hostname=args.name,
+                hostname=slugify(args.name),
                 flavorId=args.flavorid,
                 accessConfiguration=access_configuration,
                 volume=volume,

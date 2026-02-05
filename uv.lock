@@ -115,7 +115,7 @@ wheels = [
 ]
 
 [[package]]
-name = "cio"
+name = "tuca"
 source = { editable = "." }
 dependencies = [
     { name = "keyring" },

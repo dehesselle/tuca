@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from cio.resource import Resource
+from tuca.resource import Resource
 
 from .endpoint import Endpoint
 

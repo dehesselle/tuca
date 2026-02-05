@@ -10,7 +10,7 @@ from getpass import getpass
 import keyring
 
 SERVICENAME = "Clouding.io API token"
-USERNAME = "cio"
+USERNAME = "tuca"
 
 
 class Action(StrEnum):

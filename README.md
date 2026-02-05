@@ -1,4 +1,4 @@
-# Clouding.io CLI
+# tool using Clouding.io API
 
 This is an unofficial CLI tool that interacts with the Clouding.io's REST API. Its main goal is to provide a simple interface that I can use to create and destroy servers from shell scripts. Therefore it neither provides access to all available API endpoints nor to all available attributes and/or actions.
 
@@ -6,10 +6,10 @@ The project status is best described as "alpha" as things are still very much in
 
 ## Installation
 
-`cio` is on [PyPi](https://pypi.org/project/cio/), you can use the package manager of your choice to set yourself up. Here is an example using `uv`:
+`tuca` is on [PyPi](https://pypi.org/project/tuca/), you can use the package manager of your choice to set yourself up. Here is an example using `uv`:
 
 ```bash
-uv tool install cio
+uv tool install tuca
 ```
 
 ## Usage
@@ -19,14 +19,14 @@ uv tool install cio
 The CLI interface follows this pattern:
 
 ```bash
-cio <endpoint> <action> [options]
+tuca <endpoint> <action> [options]
 ```
 
 - `endpoint` is the same as in https://api.clouding.io/docs/
 - `action` is one of `create`, `list` and `delete`
 - `options` depend on `endpoint` and `action`, consult `--help` for details
 
-`cio` writes pretty-printed JSON (no colors) to `stdout`. It's both human-readable and intended to be piped into `jq` for non-interactive usage. The following example shows the available SSH keys (redacted values) in a freshly created account:
+`tuca` writes pretty-printed JSON (no colors) to `stdout`. It's both human-readable and intended to be piped into `jq` for non-interactive usage. The following example shows the available SSH keys (redacted values) in a freshly created account:
 
 ```json
 {
@@ -55,10 +55,10 @@ Before showing you examples, you need to setup an API token first. You can do th
 export CLOUDINGIO_API_TOKEN=my_secret_token
 ```
 
-Or, more securely, have cio write it into your desktop's keyring. The following command will give you an interactive prompt to do that.
+Or, more securely, have tuca write it into your desktop's keyring. The following command will give you an interactive prompt to do that.
 
 ```
-cio auth create
+tuca auth create
 ```
 
 _And before you say anything, I'm aware that `auth` is not an endpoint._
@@ -70,7 +70,7 @@ If you provide both, the environment variable takes precendence.
 Time to create your first server. First, pick an image.
 
 ```bash
-cio images list
+tuca images list
 ```
 
 <details>
@@ -100,7 +100,7 @@ _(modified/shortened for brevity)_
 Now pick a size.
 
 ```bash
-cio flavors list
+tuca flavors list
 ```
 
 <details>
@@ -132,7 +132,7 @@ That's all to create a server with minimal configuration.
 # 8 cores, 16 GB RAM
 # default firewall
 # default image size
-cio servers create --image jXEm7yK3MJ2VYkQ9 --name MyWinServer --flavorid 8x16 --password start123
+tuca servers create --image jXEm7yK3MJ2VYkQ9 --name MyWinServer --flavorid 8x16 --password start123
 ```
 
 <details>
@@ -156,7 +156,7 @@ cio servers create --image jXEm7yK3MJ2VYkQ9 --name MyWinServer --flavorid 8x16 -
 Spooling up the server can take some time and you can check how it's doing.
 
 ```bash
-cio servers list --name MyWinServer
+tuca servers list --name MyWinServer
 ```
 <details>
 <summary>Output</summary>
@@ -198,4 +198,4 @@ The server will be ready eventually.
 
 ## License
 
-[GPL-2.0-or-later](https://github.com/dehesselle/cio/blob/main/LICENSE)
+[GPL-2.0-or-later](https://github.com/dehesselle/tuca/blob/main/LICENSE)

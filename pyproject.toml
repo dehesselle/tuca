@@ -1,7 +1,7 @@
 [project]
-name = "cio"
+name = "tuca"
 dynamic = ["version"]
-description = "Add your description here"
+description = "tool using clouding api"
 readme = "README.md"
 authors = [{ name = "René de Hesselle", email = "dehesselle@web.de" }]
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cio = "cio:main"
+tuca = "tuca:main"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
@@ -24,4 +24,4 @@ build-backend = "hatchling.build"
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/cio/_version.py"
+version-file = "src/tuca/_version.py"

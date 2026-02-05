@@ -5,7 +5,7 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from cio.resource import Resource
+from tuca.resource import Resource
 
 from .endpoint import Endpoint, RequestPayload
 

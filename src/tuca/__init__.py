@@ -4,16 +4,16 @@
 
 import argparse
 
-from cio.auth import setup_auth_cli
-from cio.config import config
-from cio.endpoints import (
+from tuca.auth import setup_auth_cli
+from tuca.config import config
+from tuca.endpoints import (
     setup_images_endpoint,
     setup_keypairs_endpoint,
     setup_servers_endpoint,
     setup_sizes_endpoint,
     setup_snapshots_endpoint,
 )
-from cio.version import VERSION
+from tuca.version import VERSION
 
 
 def main() -> None:
@@ -25,7 +25,7 @@ def main() -> None:
         default=False,
         help="make output verbose",
     )
-    parser.add_argument("--version", action="version", version=f"cio {VERSION}")
+    parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
     endpoints = parser.add_subparsers(help="manageable endpoints", dest="endpoint")
     setup_auth_cli(endpoints)
     setup_images_endpoint(endpoints)

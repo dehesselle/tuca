@@ -5,7 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
-src/cio/_version.py
+src/tuca/_version.py
 
 # Virtual environments
 .venv

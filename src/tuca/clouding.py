@@ -9,7 +9,7 @@ import requests
 from pydantic import BaseModel, Field
 from urlpath import URL
 
-from cio.auth import get_token
+from tuca.auth import get_token
 
 
 class ResponseHeader(BaseModel):

@@ -7,9 +7,9 @@ import json
 
 from pydantic import BaseModel, ValidationError
 
-from cio.clouding import Clouding, DeleteResponse
-from cio.config import config
-from cio.resource import Resource
+from tuca.clouding import Clouding, DeleteResponse
+from tuca.config import config
+from tuca.resource import Resource
 
 
 class RequestPayload(BaseModel):

@@ -12,7 +12,7 @@ from enum import StrEnum, auto
 from pydantic import BaseModel
 from slugify import slugify
 
-from cio.resource import Resource
+from tuca.resource import Resource
 
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls

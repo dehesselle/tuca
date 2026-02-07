@@ -13,9 +13,9 @@ from tuca.auth import get_token
 
 
 class ResponseHeader(BaseModel):
-    # rate_limit_limit: str = Field(alias="X-Rate-Limit-Limit", default="")
-    rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining")
-    # rate_limit_reset: str = Field(alias="X-Rate-Limit-Reset", default="")
+    rate_limit_limit: str = Field(alias="X-Rate-Limit-Limit", default="")
+    rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining", default="")
+    rate_limit_reset: str = Field(alias="X-Rate-Limit-Reset", default="")
 
 
 class DeleteResponse(BaseModel):
@@ -61,7 +61,7 @@ class Clouding:
         self.endpoint = ""
         self.query = ""
         self.response = requests.Response()
-        self.response_header = ResponseHeader(**{"X-Rate-Limit-Remaining": ""})
+        self.response_header = ResponseHeader()
         self.response_links = ResponseLinks(next=None, previous=None)
         self.response_meta = ResponseMeta(total=0)
         self.delete_response = DeleteResponse(id="")

@@ -98,7 +98,11 @@ class Endpoint[T: Resource]:
                 "endpoint": self.endpoint,
                 "status_code": self.clouding.response.status_code,
             }
-            response["verbose"].update(self.clouding.response_header.model_dump())
+            response["verbose"].update(
+                self.clouding.response_header.model_dump(
+                    include={"rate_limit_remaining"}
+                )
+            )
         return json.dumps(
             response,
             indent=4,

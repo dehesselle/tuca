@@ -12,7 +12,7 @@ from enum import StrEnum, auto
 from pydantic import BaseModel
 from slugify import slugify
 
-from tuca.resource import Resource
+from tuca.resource import NamedResource
 
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
@@ -54,9 +54,7 @@ class CreateRequestPayload(RequestPayload):
     publicPortFirewallIds: list[str]
 
 
-class Server(Resource):
-    id: str
-    name: str
+class Server(NamedResource):
     createdAt: str = ""
     publicIp: str | None = ""
     status: str

@@ -2,14 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from tuca.resource import Resource
+from tuca.resource import NamedResource
 
 from .endpoint import Endpoint
 
 
-class Firewall(Resource):
-    id: str
-    name: str
+class Firewall(NamedResource):
+    pass
 
 
 class Firewalls(Endpoint[Firewall]):

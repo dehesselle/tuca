@@ -5,7 +5,7 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from tuca.resource import Resource
+from tuca.resource import NamedResource
 
 from .endpoint import Endpoint, RequestPayload
 
@@ -16,9 +16,7 @@ class Action(StrEnum):
     LIST = auto()
 
 
-class Keypair(Resource):
-    id: str
-    name: str
+class Keypair(NamedResource):
     fingerprint: str
 
 

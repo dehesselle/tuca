@@ -5,7 +5,7 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from tuca.resource import Resource
+from tuca.resource import NamedResource
 
 from .endpoint import Endpoint
 from .images import Image
@@ -15,9 +15,7 @@ class Action(StrEnum):
     LIST = auto()
 
 
-class Snapshot(Resource):
-    id: str
-    name: str
+class Snapshot(NamedResource):
     createdAt: str
     sizeGb: int
     image: Image

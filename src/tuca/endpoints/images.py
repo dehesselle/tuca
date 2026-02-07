@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from pydantic import BaseModel
 
-from tuca.resource import Resource
+from tuca.resource import NamedResource
 
 from .endpoint import Endpoint
 
@@ -21,9 +21,7 @@ class AccessMethods(BaseModel):
     password: str
 
 
-class Image(Resource):
-    id: str
-    name: str
+class Image(NamedResource):
     accessMethods: AccessMethods
     minimumSizeGb: int | None = None  # 'None' default for reusability in Snapshot
 

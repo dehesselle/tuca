@@ -17,3 +17,11 @@ class Resource(BaseModel):
             indent=4,
             sort_keys=True,
         )
+
+
+class IdentifiableResource(Resource):
+    id: str
+
+
+class NamedResource(IdentifiableResource):
+    name: str

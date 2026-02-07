@@ -5,7 +5,7 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from tuca.resource import Resource
+from tuca.resource import IdentifiableResource, Resource
 
 from .endpoint import Endpoint
 
@@ -14,8 +14,7 @@ class Action(StrEnum):
     LIST = auto()
 
 
-class Flavor(Resource):
-    id: str
+class Flavor(IdentifiableResource):
     vCores: float
     ramGb: int
     pricePerHour: float

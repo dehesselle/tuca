@@ -32,4 +32,4 @@ def setup_snapshots_endpoint(subparser: _SubParsersAction):
     snapshot_action_list = snapshot_actions.add_parser(
         Action.LIST, help="list snapshots"
     )
-    snapshot_action_list.set_defaults(func=Snapshots.list_resources)
+    snapshot_action_list.set_defaults(func=Snapshots().list_resources)

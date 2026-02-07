@@ -123,7 +123,9 @@ class Servers(Endpoint[Server]):
                     with ThreadPoolExecutor() as executor:
 
                         def wait(id: str, status: Status, seconds: int) -> None:
-                            while Servers().get_by_id(id).status != status:
+                            while server := Servers().get_by_id(id):
+                                if server.status == status:
+                                    break
                                 time.sleep(seconds)
 
                         future = executor.submit(wait, server_id, Status.ACTIVE, 30)
@@ -170,10 +172,10 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
     id_or_name = server_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
-    server_action_delete.set_defaults(func=Servers.delete_resource)
+    server_action_delete.set_defaults(func=Servers().delete_resource)
 
     server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
     id_or_name = server_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
-    server_action_list.set_defaults(func=Servers.list_resources)
+    server_action_list.set_defaults(func=Servers().list_resources)

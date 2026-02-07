@@ -5,7 +5,7 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from tuca.resource import NamedResource
 
@@ -23,7 +23,7 @@ class AccessMethods(BaseModel):
 
 class Image(NamedResource):
     accessMethods: AccessMethods
-    minimumSizeGb: int | None = None  # 'None' default for reusability in Snapshot
+    minimumSizeGb: int = Field(default=0)  # default for reusability in Snapshot
 
 
 class Images(Endpoint[Image]):
@@ -35,4 +35,4 @@ def setup_images_endpoint(subparser: _SubParsersAction):
     images = subparser.add_parser("images", help="manage images")
     images_actions = images.add_subparsers(help="available actions")
     images_action_list = images_actions.add_parser(Action.LIST, help="list snapshots")
-    images_action_list.set_defaults(func=Images.list_resources)
+    images_action_list.set_defaults(func=Images().list_resources)

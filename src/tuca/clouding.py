@@ -25,6 +25,9 @@ class DeleteResponse(BaseModel):
     resourceId: str = ""
     resourceType: str = ""
 
+    def to_dict(self) -> dict:
+        return {"delete": [self.model_dump()]}
+
 
 class ResponseLinks(BaseModel):
     next: str | None

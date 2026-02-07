@@ -51,11 +51,11 @@ def setup_sizes_endpoint(subparser: _SubParsersAction):
     volumesizes_action_list = volumesizes_actions.add_parser(
         Action.LIST, help="list volume sizes"
     )
-    volumesizes_action_list.set_defaults(func=Sizes.list_resources)
+    volumesizes_action_list.set_defaults(func=Sizes().list_resources)
 
     flavors = subparser.add_parser("flavors", help="query cpu/memory combos")
     flavors_actions = flavors.add_subparsers(help="available actions")
     flavors_action_list = flavors_actions.add_parser(
         Action.LIST, help="list volume sizes"
     )
-    flavors_action_list.set_defaults(func=Flavors.list_resources)
+    flavors_action_list.set_defaults(func=Flavors().list_resources)

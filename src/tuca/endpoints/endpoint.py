@@ -4,7 +4,7 @@
 
 import argparse
 import json
-from typing import Type
+from typing import Type, cast
 
 from pydantic import BaseModel, ValidationError
 
@@ -33,7 +33,7 @@ class Endpoint[T: Resource]:
         )
         return self._deserialize_response()
 
-    def delete(self: "Endpoint[IdentifiableResource]", id: str) -> DeleteResponse:
+    def delete(self, id: str) -> DeleteResponse:
         self.clouding.delete(self.endpoint, id)
         return self.clouding.delete_response
 
@@ -47,76 +47,63 @@ class Endpoint[T: Resource]:
                 self.resources.extend(self._deserialize_response(self.response_key))
         return self.resources
 
-    def get_by_id(
-        self: "Endpoint[IdentifiableResource]", id: str
-    ) -> IdentifiableResource | None:
+    def get_by_id(self, id: str) -> T | None:
         try:
             return self._by_id[id]
         except KeyError:
             return None
 
-    def get_by_name(self: "Endpoint[NamedResource]", name: str) -> NamedResource | None:
+    def get_by_name(self, name: str) -> T | None:
         try:
             return self._by_name[name]
         except KeyError:
             return None
 
-    def to_str(self, models: list[T] | T | None = None) -> str:
-        list_name = self.endpoint
-        if models is None:
-            models = self.get()
-        elif not isinstance(models, list):
-            if isinstance(models, DeleteResponse):
-                list_name = "delete"
-            models = [models]
-        result = {list_name: [model.model_dump() for model in models]}
-        if config.be_verbose:
-            result["verbose"] = {  # pyright: ignore[reportArgumentType]
-                "endpoint": self.endpoint,
-                "status_code": self.clouding.response.status_code,
-            }
-            result["verbose"].update(self.clouding.response_header.model_dump())
-        return json.dumps(
-            result,
-            indent=4,
-            sort_keys=True,
-        )
+    def to_str(self, resources: list[T] | T | None = None) -> str:
+        if resources is None:
+            resources = self.get()
+        elif not isinstance(resources, list):
+            resources = [resources]
+        result = {self.endpoint: [resource.model_dump() for resource in resources]}
+        return self._to_str(result)
 
-    @classmethod
-    def list_resources(
-        cls, args: argparse.Namespace
-    ):  # This is like an abstract method *but* with a body, i.e. the code
-        # here works for derived classes but doesn't work for the base class.
-        # That's what PyLance complains about.
-        # I haven't come up with a better solution yet.
-        endpoint = cls()
+    def list_resources(self, args: argparse.Namespace):
         if hasattr(args, "id") and args.id:
-            print(endpoint.to_str(endpoint.get_by_id(args.id)))
+            print(self.to_str(self.get_by_id(args.id)))
         elif hasattr(args, "name") and args.name:
-            print(endpoint.to_str(endpoint.get_by_name(args.name)))
+            print(self.to_str(self.get_by_name(args.name)))
         else:
-            print(endpoint.to_str())
+            print(self.to_str())
 
-    @classmethod
-    def delete_resource(
-        cls, args: argparse.Namespace
-    ):  # See comment in list_resources() above.
-        endpoint = cls()
+    def delete_resource(self, args: argparse.Namespace):
         if args.name:
-            if resource := endpoint.get_by_name(args.name):
-                resource_id = resource.id
+            if resource := self.get_by_name(args.name):
+                resource_id = cast(NamedResource, resource).id
             else:
                 resource_id = ""
         else:
             resource_id = args.id
 
         if resource_id:
-            response = endpoint.delete(resource_id)
+            response = self.delete(resource_id)
             # TODO not checking anything
-            print(endpoint.to_str(response))
+            print(self._to_str(response.to_dict()))
         else:
             print(f"resource_id not found: {resource_id}")  # TODO
             exit(1)
+
+    def _to_str(self, response: dict) -> str:
+        if config.be_verbose:
+            response["verbose"] = {
+                "endpoint": self.endpoint,
+                "status_code": self.clouding.response.status_code,
+            }
+            response["verbose"].update(self.clouding.response_header.model_dump())
+        return json.dumps(
+            response,
+            indent=4,
+            sort_keys=True,
+        )
 
     def _deserialize_response(self, key: str = "") -> list[T]:
         result = []
@@ -143,10 +130,12 @@ class Endpoint[T: Resource]:
 
     @property
     def _by_id(
-        self: "Endpoint[IdentifiableResource]",
-    ) -> dict[str, IdentifiableResource]:
-        return {resource.id: resource for resource in self.get()}
+        self,
+    ) -> dict[str, T]:
+        return {
+            cast(IdentifiableResource, resource).id: resource for resource in self.get()
+        }
 
     @property
-    def _by_name(self: "Endpoint[NamedResource]") -> dict[str, NamedResource]:
-        return {resource.name: resource for resource in self.get()}
+    def _by_name(self) -> dict[str, T]:
+        return {cast(NamedResource, resource).name: resource for resource in self.get()}

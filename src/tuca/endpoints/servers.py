@@ -115,8 +115,9 @@ class Servers(Endpoint[Server]):
                 publicPortFirewallIds=[firewall_id],
             )
             servers = Servers()
-            if server := servers.create(payload):
-                server_id = server[0].id
+            servers.create(payload)
+            if servers.resources:
+                server_id = servers.resources[0].id
                 if args.wait:
                     if platform.system() == "Windows":
                         signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work

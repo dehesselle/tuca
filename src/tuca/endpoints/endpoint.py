@@ -106,10 +106,10 @@ class Endpoint[T: Resource]:
         )
 
     def _deserialize_response(self, key: str = "") -> list[T]:
-        result = []
+        self.resources.clear()
         if self.clouding.is_status_ok:
             try:
-                result.extend(
+                self.resources.extend(
                     [
                         self.component_type.model_validate(_)
                         for _ in (
@@ -126,7 +126,7 @@ class Endpoint[T: Resource]:
                 print(self.clouding.response.json()[key])
         else:
             print(f"HTTP {self.clouding.response.status_code}")  # TODO
-        return result
+        return self.resources
 
     @property
     def _by_id(

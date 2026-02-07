@@ -31,8 +31,8 @@ class Keypairs(Endpoint[Keypair]):
             name=args.name, publicKey=args.publickey, privateKey=args.privatekey
         )
         keypairs = Keypairs()
-        keypair = keypairs.create(payload)
-        print(keypairs.to_str(keypair))
+        keypairs.create(payload)
+        print(keypairs.to_str())
 
 
 class CreateRequestPayload(RequestPayload):

@@ -25,7 +25,7 @@ tuca <endpoint> <action> [options]
 - `endpoint` is the same as in https://api.clouding.io/docs/  
   💁 _Not all endpoints are supported!_
 - `action` is one of `create`, `list` and `delete`  
-  💁 _Supported actions depend on endpoint.!_
+  💁 _Supported actions depend on endpoint!_
 - `options` depend on `endpoint` and `action`  
   💁 _Consult `--help` for details!_
 
@@ -50,7 +50,7 @@ The output is
 - contains an opionated subset of the available attributes, but always `id` and `name`
 - limited to a maximum of 100 entries
 
-### Authentication
+### Setup authentication
 
 First order of business is setting up an API token. You can do that via environment variable:
 
@@ -68,9 +68,9 @@ _And before you say anything, I'm aware that `auth` is not an endpoint._
 
 If you provide both, the environment variable takes precendence.
 
-### Here we go
+### Create a server
 
-Time to create your first server. Pick an image.
+Pick one of the available images.
 
 ```bash
 tuca images list
@@ -100,7 +100,7 @@ _(modified/shortened for brevity)_
 ```
 </details>
 
-Now pick a size.
+Now pick one of the available flavors (server sizes).
 
 ```bash
 tuca flavors list
@@ -128,7 +128,7 @@ _(modified/shortened for brevity)_
 ```
 </details>
 
-That's all to create a server with minimal configuration.
+That's sufficient to create a server with minimal configuration.
 
 ```bash
 # Windows 11 compatible image

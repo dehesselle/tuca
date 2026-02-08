@@ -11,7 +11,8 @@ from pydantic import BaseModel, ValidationError
 
 from tuca.clouding import Clouding, DeleteResponse
 from tuca.config import config
-from tuca.resource import IdentifiableResource, NamedResource, Resource
+
+from .resource import IdentifiableResource, NamedResource, Resource
 
 log = logging.getLogger("endpoint")
 

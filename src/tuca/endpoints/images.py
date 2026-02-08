@@ -7,9 +7,8 @@ from enum import StrEnum, auto
 
 from pydantic import BaseModel, Field
 
-from tuca.resource import NamedResource
-
 from .endpoint import Endpoint
+from .resource import NamedResource
 
 
 class Action(StrEnum):

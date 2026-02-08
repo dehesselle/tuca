@@ -13,11 +13,10 @@ from enum import StrEnum, auto
 from pydantic import BaseModel
 from slugify import slugify
 
-from tuca.resource import NamedResource
-
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
 from .images import Images
+from .resource import NamedResource
 from .sizes import Flavors
 from .snapshots import Snapshots
 

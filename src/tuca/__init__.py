@@ -4,7 +4,7 @@
 
 import argparse
 
-from tuca.auth import setup_auth_cli
+from tuca.clouding import setup_auth_cli
 from tuca.config import config
 from tuca.endpoints import (
     setup_images_endpoint,

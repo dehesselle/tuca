@@ -10,7 +10,7 @@ import requests
 from pydantic import BaseModel, Field
 from urlpath import URL
 
-from tuca.auth import get_token
+from .auth import get_token
 
 log = logging.getLogger("clouding")
 

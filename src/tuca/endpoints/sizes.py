@@ -5,9 +5,8 @@
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
 
-from tuca.resource import IdentifiableResource, Resource
-
 from .endpoint import Endpoint
+from .resource import IdentifiableResource, Resource
 
 
 class Action(StrEnum):

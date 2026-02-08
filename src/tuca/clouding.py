@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import json
+import logging
 from http import HTTPStatus
 
 import requests
@@ -10,6 +11,8 @@ from pydantic import BaseModel, Field
 from urlpath import URL
 
 from tuca.auth import get_token
+
+log = logging.getLogger("clouding")
 
 
 class ResponseHeader(BaseModel):
@@ -131,6 +134,5 @@ class Clouding:
             except KeyError:
                 pass  # non-paginated responses don't have links and meta
         else:
-            # FIXME: rework error handling
-            print("invalid HTTP status", self.response.status_code)
+            log.error(f"invalid HTTP status: {self.response.status_code}")
             exit(1)

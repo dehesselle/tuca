@@ -13,10 +13,13 @@ from tuca.endpoints import (
     setup_sizes_endpoint,
     setup_snapshots_endpoint,
 )
+from tuca.log import setup_logging
 from tuca.version import VERSION
 
 
 def main() -> None:
+    setup_logging()
+
     parser = argparse.ArgumentParser(description="unofficial CLI for Clouding.io")
     parser.add_argument(
         "-v",

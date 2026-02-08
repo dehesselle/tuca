@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import logging
 import platform
 import signal
 import time
@@ -19,6 +20,8 @@ from .firewalls import Firewalls
 from .images import Images
 from .sizes import Flavors
 from .snapshots import Snapshots
+
+log = logging.getLogger("servers")
 
 
 class Action(StrEnum):
@@ -67,7 +70,7 @@ class Servers(Endpoint[Server]):
     @classmethod
     def create_resource(cls, args):
         if args.flavorid not in Flavors().all:
-            print(f"flavor not supported: {args.flavorid}")
+            log.error(f"flavor not found: {args.flavorid}")
             exit(1)
 
         if args.snapshot:
@@ -76,7 +79,7 @@ class Servers(Endpoint[Server]):
                     source="snapshot", id=args.snapshot, ssdGb=snapshot.sizeGb
                 )
             else:
-                print(f"snapshot not found: {args.snapshot}")
+                log.error(f"snapshot not found: {args.snapshot}")
                 exit(1)
         elif args.image:
             if image := Images().get_by_id(args.image):
@@ -84,10 +87,10 @@ class Servers(Endpoint[Server]):
                     source="image", id=args.image, ssdGb=image.minimumSizeGb
                 )
             else:
-                print(f"image not found: {args.image}")
+                log.error(f"image not found: {args.image}")
                 exit(1)
         else:
-            print("mandatory mutually exclusive option missing")
+            log.error("missing mandatory option: snapshot|image")
             exit(1)
 
         if args.password:
@@ -99,7 +102,7 @@ class Servers(Endpoint[Server]):
                 sshKeyId=args.sshkey, password=None, savePassword=False
             )
         else:
-            print("mandatory mutually exclusive option missing")
+            log.error("missing mandatory option: password|sshkey")
             exit(1)
 
         firewall_id = 0
@@ -136,9 +139,10 @@ class Servers(Endpoint[Server]):
                             future.cancel()
                 print(servers.to_str(Servers().get_by_id(server_id)))
             else:
-                print("failed to create server")
+                log.error("failed to create server")
+                exit(1)
         else:
-            print("error no firewall_id")  # TODO
+            log.error(f"firewall not found {args.firewall}")
             exit(1)
 
 

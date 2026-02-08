@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import logging
 import os
 from argparse import _SubParsersAction
 from enum import StrEnum, auto
@@ -11,6 +12,8 @@ import keyring
 
 SERVICENAME = "Clouding.io API token"
 USERNAME = "tuca"
+
+log = logging.getLogger("auth")
 
 
 class Action(StrEnum):
@@ -25,9 +28,15 @@ def set_token(_) -> None:
 
 def get_token(_) -> str:
     if api_token := os.getenv("CLOUDINGIO_API_TOKEN"):
+        log.debug("auth via environment variable")
         return api_token
     else:
-        return keyring.get_password(SERVICENAME, USERNAME)
+        log.debug("auth via keyring")
+        if api_token := keyring.get_password(SERVICENAME, USERNAME):
+            return api_token
+        else:
+            log.error("no authentication")
+            exit(1)
 
 
 def delete_token(_) -> None:

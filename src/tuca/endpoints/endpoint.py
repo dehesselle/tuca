@@ -4,6 +4,7 @@
 
 import argparse
 import json
+import logging
 from typing import Type, cast
 
 from pydantic import BaseModel, ValidationError
@@ -11,6 +12,8 @@ from pydantic import BaseModel, ValidationError
 from tuca.clouding import Clouding, DeleteResponse
 from tuca.config import config
 from tuca.resource import IdentifiableResource, NamedResource, Resource
+
+log = logging.getLogger("endpoint")
 
 
 class RequestPayload(BaseModel):
@@ -86,11 +89,14 @@ class Endpoint[T: Resource]:
 
         if resource_id:
             response = self.delete(resource_id)
-            # TODO not checking anything
             print(self._to_str(response.to_dict()))
         else:
-            print(f"resource_id not found: {resource_id}")  # TODO
-            exit(1)
+            if args.name:
+                log.error(f"resource name not found {args.name}")
+                exit(1)
+            else:
+                log.error(f"resource id not found {resource_id}")
+                exit(1)
 
     def _to_str(self, response: dict) -> str:
         if config.be_verbose:
@@ -124,12 +130,14 @@ class Endpoint[T: Resource]:
                     ]
                 )
             except KeyError:
-                print("keyerror")  # TODO
+                log.error(f"response.json lacks key: {key}")
+                exit(1)
             except ValidationError:
-                print("validationerror")  # TODO
-                print(self.clouding.response.json()[key])
+                log.error(f"unable to deserialize contents of {key}")
+                exit(1)
         else:
-            print(f"HTTP {self.clouding.response.status_code}")  # TODO
+            log.error(f"HTTP status {self.clouding.response.status_code}")
+            exit(1)
         return self.resources
 
     @property

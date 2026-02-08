@@ -10,7 +10,7 @@ from getpass import getpass
 
 import keyring
 
-SERVICENAME = "Clouding.io API token"
+SERVICENAME = "CLOUDINGIO_API_TOKEN"
 USERNAME = "tuca"
 
 log = logging.getLogger("auth")
@@ -27,7 +27,7 @@ def set_token(_) -> None:
 
 
 def get_token(_) -> str:
-    if api_token := os.getenv("CLOUDINGIO_API_TOKEN"):
+    if api_token := os.getenv(SERVICENAME):
         log.debug("auth via environment variable")
         return api_token
     else:

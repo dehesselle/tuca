@@ -33,6 +33,7 @@ class Status(StrEnum):
     CREATING = "Creating"
     ACTIVE = "Active"
     PENDING = "Pending"
+    STOPPED = "Stopped"
 
 
 class AccessConfiguration(BaseModel):

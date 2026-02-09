@@ -30,25 +30,28 @@ class Endpoint[T: Resource]:
         self.response_key = endpoint
 
     def create(self, payload: RequestPayload) -> list[T]:
+        self.resources.clear()
         self.clouding.post(
             self.endpoint,
             payload.model_dump(),
             headers={"Content-Type": "application/json"},
         )
-        return self._deserialize_response()
+        self.resources.extend(self._deserialize_response())
+        return self.resources
 
     def delete(self, id: str) -> DeleteResponse:
+        self.resources.clear()
         self.clouding.delete(self.endpoint, id)
         return self.clouding.delete_response
 
     def get(self) -> list[T]:
-        if not self.resources:
-            self.clouding.get(self.endpoint)
+        self.resources.clear()
+        self.clouding.get(self.endpoint)
+        self.resources.extend(self._deserialize_response(self.response_key))
+        while (
+            len(self.resources) < 100 and self.clouding.next()
+        ):  # TODO configurable limit?
             self.resources.extend(self._deserialize_response(self.response_key))
-            while (
-                len(self.resources) < 100 and self.clouding.next()
-            ):  # TODO configurable limit?
-                self.resources.extend(self._deserialize_response(self.response_key))
         return self.resources
 
     def get_by_id(self, id: str) -> T | None:
@@ -145,10 +148,17 @@ class Endpoint[T: Resource]:
     def _by_id(
         self,
     ) -> dict[str, T]:
+        if not self.resources:
+            self.get()
         return {
-            cast(IdentifiableResource, resource).id: resource for resource in self.get()
+            cast(IdentifiableResource, resource).id: resource
+            for resource in self.resources
         }
 
     @property
     def _by_name(self) -> dict[str, T]:
-        return {cast(NamedResource, resource).name: resource for resource in self.get()}
+        if not self.resources:
+            self.get()
+        return {
+            cast(NamedResource, resource).name: resource for resource in self.resources
+        }

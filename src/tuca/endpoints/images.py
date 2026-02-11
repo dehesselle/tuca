@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from argparse import _SubParsersAction
+import argparse
 from enum import StrEnum, auto
 
 from pydantic import BaseModel, Field
@@ -30,8 +30,12 @@ class Images(Endpoint[Image]):
         super().__init__(Image, "images")
 
 
-def setup_images_endpoint(subparser: _SubParsersAction):
+def list_images(args: argparse.Namespace):
+    Images().list_resources(args)
+
+
+def setup_images_endpoint(subparser: argparse._SubParsersAction):
     images = subparser.add_parser("images", help="manage images")
     images_actions = images.add_subparsers(help="available actions")
     images_action_list = images_actions.add_parser(Action.LIST, help="list snapshots")
-    images_action_list.set_defaults(func=Images().list_resources)
+    images_action_list.set_defaults(func=list_images)

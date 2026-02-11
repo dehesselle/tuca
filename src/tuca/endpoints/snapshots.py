@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from argparse import _SubParsersAction
+import argparse
 from enum import StrEnum, auto
 
 from .endpoint import Endpoint
@@ -25,10 +25,14 @@ class Snapshots(Endpoint[Snapshot]):
         super().__init__(Snapshot, "snapshots")
 
 
-def setup_snapshots_endpoint(subparser: _SubParsersAction):
+def list_snapshots(args: argparse.Namespace):
+    Snapshots().list_resources(args)
+
+
+def setup_snapshots_endpoint(subparser: argparse._SubParsersAction):
     snapshots = subparser.add_parser("snapshots", help="manage snapshots")
     snapshot_actions = snapshots.add_subparsers(help="available actions")
     snapshot_action_list = snapshot_actions.add_parser(
         Action.LIST, help="list snapshots"
     )
-    snapshot_action_list.set_defaults(func=Snapshots().list_resources)
+    snapshot_action_list.set_defaults(func=list_snapshots)

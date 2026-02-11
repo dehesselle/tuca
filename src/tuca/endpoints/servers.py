@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import argparse
 import logging
 import platform
 import signal
 import time
-from argparse import _SubParsersAction
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from enum import StrEnum, auto
 
@@ -67,8 +67,7 @@ class Servers(Endpoint[Server]):
     def __init__(self):
         super().__init__(Server, "servers")
 
-    @classmethod
-    def create_resource(cls, args):
+    def create_resource(self, args):
         if args.flavorid not in Flavors().all:
             log.error(f"flavor not found: {args.flavorid}")
             exit(1)
@@ -117,10 +116,9 @@ class Servers(Endpoint[Server]):
                 volume=volume,
                 publicPortFirewallIds=[firewall_id],
             )
-            servers = Servers()
-            servers.create(payload)
-            if servers.resources:
-                server_id = servers.resources[0].id
+            self.create(payload)
+            if self.resources:
+                server_id = self.resources[0].id
                 if args.wait:
                     if platform.system() == "Windows":
                         signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
@@ -137,7 +135,7 @@ class Servers(Endpoint[Server]):
                             future.result(timeout=300)
                         except TimeoutError:
                             future.cancel()
-                print(servers.to_str(Servers().get_by_id(server_id)))
+                print(self.to_str(Servers().get_by_id(server_id)))
             else:
                 log.error("failed to create server")
                 exit(1)
@@ -146,7 +144,19 @@ class Servers(Endpoint[Server]):
             exit(1)
 
 
-def setup_servers_endpoint(subparser: _SubParsersAction):
+def create_server(args: argparse.Namespace):
+    Servers().create_resource(args)
+
+
+def delete_server(args: argparse.Namespace):
+    Servers().delete_resource(args)
+
+
+def list_servers(args: argparse.Namespace):
+    Servers().list_resources(args)
+
+
+def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     servers = subparser.add_parser("servers", help="manage servers")
     server_actions = servers.add_subparsers(help="available actions")
 
@@ -169,7 +179,7 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
     server_action_create.add_argument(
         "--wait", action="store_true", default=False, help="wait until server is active"
     )
-    server_action_create.set_defaults(func=Servers.create_resource)
+    server_action_create.set_defaults(func=create_server)
 
     server_action_delete = server_actions.add_parser(
         Action.DELETE, help="delete a server"
@@ -177,10 +187,10 @@ def setup_servers_endpoint(subparser: _SubParsersAction):
     id_or_name = server_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
-    server_action_delete.set_defaults(func=Servers().delete_resource)
+    server_action_delete.set_defaults(func=delete_server)
 
     server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
     id_or_name = server_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
-    server_action_list.set_defaults(func=Servers().list_resources)
+    server_action_list.set_defaults(func=list_servers)

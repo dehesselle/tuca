@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from argparse import _SubParsersAction
+import argparse
 from enum import StrEnum, auto
 
 from .endpoint import Endpoint, RequestPayload
@@ -24,14 +24,12 @@ class Keypairs(Endpoint[Keypair]):
         super().__init__(Keypair, "keypairs")
         self.response_key = "values"
 
-    @classmethod
-    def create_resource(cls, args):
+    def create_resource(self, args):
         payload = CreateRequestPayload(
             name=args.name, publicKey=args.publickey, privateKey=args.privatekey
         )
-        keypairs = Keypairs()
-        keypairs.create(payload)
-        print(keypairs.to_str())
+        self.create(payload)
+        print(self.to_str())
 
 
 class CreateRequestPayload(RequestPayload):
@@ -40,7 +38,19 @@ class CreateRequestPayload(RequestPayload):
     privateKey: str
 
 
-def setup_keypairs_endpoint(subparser: _SubParsersAction):
+def create_keypair(args: argparse.Namespace):
+    Keypairs().create_resource(args)
+
+
+def delete_keypair(args: argparse.Namespace):
+    Keypairs().delete_resource(args)
+
+
+def list_keypairs(args: argparse.Namespace):
+    Keypairs().list_resources(args)
+
+
+def setup_keypairs_endpoint(subparser: argparse._SubParsersAction):
     snapshots = subparser.add_parser("keypairs", help="manage keypairs")
     keypair_actions = snapshots.add_subparsers(help="available actions")
 
@@ -50,7 +60,7 @@ def setup_keypairs_endpoint(subparser: _SubParsersAction):
     keypair_action_create.add_argument("--name", type=str, required=True)
     keypair_action_create.add_argument("--publickey", type=str, required=True)
     keypair_action_create.add_argument("--privatekey", type=str, default="")
-    keypair_action_create.set_defaults(func=Keypairs.create_resource)
+    keypair_action_create.set_defaults(func=create_keypair)
 
     keypair_action_delete = keypair_actions.add_parser(
         Action.DELETE, help="delete a server"
@@ -58,8 +68,8 @@ def setup_keypairs_endpoint(subparser: _SubParsersAction):
     id_or_name = keypair_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
-    keypair_action_delete.set_defaults(func=Keypairs().delete_resource)
+    keypair_action_delete.set_defaults(func=delete_keypair)
 
     keypair_action_list = keypair_actions.add_parser(Action.LIST, help="list keypairs")
     keypair_action_list.add_argument("-i", "--id", default="", required=False)
-    keypair_action_list.set_defaults(func=Keypairs().list_resources)
+    keypair_action_list.set_defaults(func=list_keypairs)

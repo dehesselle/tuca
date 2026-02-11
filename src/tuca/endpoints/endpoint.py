@@ -74,14 +74,6 @@ class Endpoint[T: Resource]:
         result = {self.endpoint: [resource.model_dump() for resource in resources]}
         return self._to_str(result)
 
-    def list_resources(self, args: argparse.Namespace):
-        if hasattr(args, "id") and args.id:
-            print(self.to_str(self.get_by_id(args.id)))
-        elif hasattr(args, "name") and args.name:
-            print(self.to_str(self.get_by_name(args.name)))
-        else:
-            print(self.to_str())
-
     def delete_resource(self, args: argparse.Namespace):
         if args.name:
             if resource := self.get_by_name(args.name):
@@ -101,6 +93,14 @@ class Endpoint[T: Resource]:
             else:
                 log.error(f"resource id not found {resource_id}")
                 exit(1)
+
+    def list_resources(self, args: argparse.Namespace):
+        if hasattr(args, "id") and args.id:
+            print(self.to_str(self.get_by_id(args.id)))
+        elif hasattr(args, "name") and args.name:
+            print(self.to_str(self.get_by_name(args.name)))
+        else:
+            print(self.to_str())
 
     def _to_str(self, response: dict) -> str:
         if config.be_verbose:

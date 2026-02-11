@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from argparse import _SubParsersAction
+import argparse
 from enum import StrEnum, auto
 
 from .endpoint import Endpoint
@@ -44,17 +44,25 @@ class Sizes(Endpoint[VolumeSize]):
         self.response_key = "volumeSizes"
 
 
-def setup_sizes_endpoint(subparser: _SubParsersAction):
+def list_flavors(args: argparse.Namespace):
+    Flavors().list_resources(args)
+
+
+def list_sizes(args: argparse.Namespace):
+    Sizes().list_resources(args)
+
+
+def setup_sizes_endpoint(subparser: argparse._SubParsersAction):
     volumesizes = subparser.add_parser("volumesizes", help="query volume sizes")
     volumesizes_actions = volumesizes.add_subparsers(help="available actions")
     volumesizes_action_list = volumesizes_actions.add_parser(
         Action.LIST, help="list volume sizes"
     )
-    volumesizes_action_list.set_defaults(func=Sizes().list_resources)
+    volumesizes_action_list.set_defaults(func=list_sizes)
 
-    flavors = subparser.add_parser("flavors", help="query cpu/memory combos")
+    flavors = subparser.add_parser("flavors", help="query cpu/memory sizes")
     flavors_actions = flavors.add_subparsers(help="available actions")
     flavors_action_list = flavors_actions.add_parser(
-        Action.LIST, help="list volume sizes"
+        Action.LIST, help="list server sizes"
     )
-    flavors_action_list.set_defaults(func=Flavors().list_resources)
+    flavors_action_list.set_defaults(func=list_flavors)

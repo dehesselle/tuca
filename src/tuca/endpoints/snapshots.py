@@ -35,6 +35,9 @@ def setup_snapshots_endpoint(subparser: argparse._SubParsersAction):
     snapshot_action_list = snapshot_actions.add_parser(
         Action.LIST, help="list snapshots"
     )
+    id_or_name = snapshot_action_list.add_mutually_exclusive_group(required=False)
+    id_or_name.add_argument("--id", type=str, default="")
+    id_or_name.add_argument("--name", type=str, default="")
     snapshot_action_list.add_argument(
         "--filter",
         type=str,

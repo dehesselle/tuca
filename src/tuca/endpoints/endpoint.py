@@ -55,10 +55,10 @@ class Endpoint[T: Resource]:
         return self.resources
 
     def get_by_id(self, id: str) -> T | None:
-        try:
-            return self._by_id[id]
-        except KeyError:
-            return None
+        self.resources.clear()
+        self.clouding.get(self.endpoint + "/" + id)
+        self.resources.extend(self._deserialize_response())
+        return self.resources[0] if self.resources else None
 
     def get_by_name(self, name: str) -> T | None:
         try:

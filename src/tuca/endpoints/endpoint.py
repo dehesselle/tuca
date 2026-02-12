@@ -66,6 +66,22 @@ class Endpoint[T: Resource]:
         except KeyError:
             return None
 
+    def find(self, filter: str) -> list[T]:
+        if not self.resources:
+            self.get()
+        return [
+            resource
+            for resource in self.resources
+            if (
+                hasattr(resource, "id")
+                and filter.lower() in cast(IdentifiableResource, resource).id.lower()
+            )
+            or (
+                hasattr(resource, "name")
+                and filter.lower() in cast(NamedResource, resource).name.lower()
+            )
+        ]
+
     def to_str(self, resources: list[T] | T | None = None) -> str:
         if resources is None:
             resources = self.get()
@@ -99,6 +115,8 @@ class Endpoint[T: Resource]:
             print(self.to_str(self.get_by_id(args.id)))
         elif hasattr(args, "name") and args.name:
             print(self.to_str(self.get_by_name(args.name)))
+        elif hasattr(args, "filter") and args.filter:
+            print(self.to_str(self.find(args.filter)))
         else:
             print(self.to_str())
 

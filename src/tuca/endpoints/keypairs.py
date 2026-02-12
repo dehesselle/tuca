@@ -72,4 +72,11 @@ def setup_keypairs_endpoint(subparser: argparse._SubParsersAction):
 
     keypair_action_list = keypair_actions.add_parser(Action.LIST, help="list keypairs")
     keypair_action_list.add_argument("-i", "--id", default="", required=False)
+    keypair_action_list.add_argument(
+        "--filter",
+        type=str,
+        default="",
+        required=False,
+        help="case-insensitive matching with name and id",
+    )
     keypair_action_list.set_defaults(func=list_keypairs)

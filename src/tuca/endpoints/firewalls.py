@@ -37,4 +37,11 @@ def setup_firewalls_endpoint(subparser: argparse._SubParsersAction):
     id_or_name = firewall_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
+    firewall_action_list.add_argument(
+        "--filter",
+        type=str,
+        default="",
+        required=False,
+        help="case-insensitive matching with name and id",
+    )
     firewall_action_list.set_defaults(func=list_firewalls)

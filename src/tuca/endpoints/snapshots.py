@@ -35,4 +35,11 @@ def setup_snapshots_endpoint(subparser: argparse._SubParsersAction):
     snapshot_action_list = snapshot_actions.add_parser(
         Action.LIST, help="list snapshots"
     )
+    snapshot_action_list.add_argument(
+        "--filter",
+        type=str,
+        default="",
+        required=False,
+        help="case-insensitive matching with name and id",
+    )
     snapshot_action_list.set_defaults(func=list_snapshots)

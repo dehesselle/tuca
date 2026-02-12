@@ -70,21 +70,54 @@ If you provide both, the environment variable takes precendence.
 
 ### Create a server
 
-Pick one of the available images.
+Pick one of the available Windows images.
 
 ```bash
-tuca images list
+tuca images list --filter windows
 ```
 
 <details>
 <summary>Output</summary>
 
-_(modified/shortened for brevity)_
-
 ```json
 {
-    "sizes/flavors": [
-        ...
+    "images": [
+        {
+            "accessMethods": {
+                "password": "required",
+                "sshKey": "not-supported"
+            },
+            "id": "Lka79zd4JDnxyr85",
+            "minimumSizeGb": 25,
+            "name": "Windows Server 2022 Datacenter (English 64Bit)"
+        },
+        {
+            "accessMethods": {
+                "password": "required",
+                "sshKey": "not-supported"
+            },
+            "id": "jG4bZNnEQznYx7LP",
+            "minimumSizeGb": 25,
+            "name": "Windows Server 2016 Datacenter (English 64Bit) EOL"
+        },
+        {
+            "accessMethods": {
+                "password": "required",
+                "sshKey": "not-supported"
+            },
+            "id": "WwQ6kDdVqb2Jeaml",
+            "minimumSizeGb": 25,
+            "name": "Windows Server 2019 Datacenter (English 64Bit) EOL"
+        },
+        {
+            "accessMethods": {
+                "password": "required",
+                "sshKey": "not-supported"
+            },
+            "id": "kbxmpG2bXvKwlaDg",
+            "minimumSizeGb": 25,
+            "name": "Windows Server 2025 Datacenter (English 64Bit)"
+        },
         {
             "accessMethods": {
                 "password": "required",
@@ -94,7 +127,15 @@ _(modified/shortened for brevity)_
             "minimumSizeGb": 25,
             "name": "Windows 11 (English 64Bit | Based on Windows Server 2025)"
         },
-        ...
+        {
+            "accessMethods": {
+                "password": "required",
+                "sshKey": "not-supported"
+            },
+            "id": "q58XEgdA0P26mA0j",
+            "minimumSizeGb": 25,
+            "name": "Windows 11 (Espa\u00f1ol 64Bit | Basado en Windows Server 2025)"
+        }
     ]
 }
 ```

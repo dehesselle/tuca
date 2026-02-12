@@ -105,10 +105,10 @@ class Endpoint[T: Resource]:
             print(self._to_str(response.to_dict()))
         else:
             if args.name:
-                log.error(f"resource name not found {args.name}")
+                log.error(f"resource name not found: {args.name}")
                 exit(1)
             else:
-                log.error(f"resource id not found {resource_id}")
+                log.error(f"resource id not found: {resource_id}")
                 exit(1)
 
     def list_resources(self, args: argparse.Namespace):
@@ -156,10 +156,10 @@ class Endpoint[T: Resource]:
                 log.error(f"response.json lacks key: {key}")
                 exit(1)
             except ValidationError:
-                log.error(f"unable to deserialize contents of {key}")
+                log.error(f"unable to deserialize contents of: {key}")
                 exit(1)
         else:
-            log.error(f"HTTP status {self.clouding.response.status_code}")
+            log.error(f"HTTP status: {self.clouding.response.status_code}")
             exit(1)
         return result
 

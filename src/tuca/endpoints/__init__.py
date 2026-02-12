@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from .firewalls import setup_firewalls_endpoint
 from .images import setup_images_endpoint
 from .keypairs import setup_keypairs_endpoint
 from .servers import setup_servers_endpoint

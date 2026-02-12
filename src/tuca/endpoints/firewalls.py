@@ -2,8 +2,15 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import argparse
+from enum import StrEnum, auto
+
 from .endpoint import Endpoint
 from .resource import NamedResource
+
+
+class Action(StrEnum):
+    LIST = auto()
 
 
 class Firewall(NamedResource):
@@ -14,3 +21,20 @@ class Firewalls(Endpoint[Firewall]):
     def __init__(self):
         super().__init__(Firewall, "firewalls")
         self.response_key = "values"
+
+
+def list_firewalls(args: argparse.Namespace):
+    Firewalls().list_resources(args)
+
+
+def setup_firewalls_endpoint(subparser: argparse._SubParsersAction):
+    firewalls = subparser.add_parser("firewalls", help="manage firewalls")
+    firewall_actions = firewalls.add_subparsers(help="available actions")
+
+    firewall_action_list = firewall_actions.add_parser(
+        Action.LIST, help="list firewalls"
+    )
+    id_or_name = firewall_action_list.add_mutually_exclusive_group(required=False)
+    id_or_name.add_argument("--id", type=str, default="")
+    id_or_name.add_argument("--name", type=str, default="")
+    firewall_action_list.set_defaults(func=list_firewalls)

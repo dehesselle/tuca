@@ -73,17 +73,33 @@ class Servers(Endpoint[Server]):
             exit(1)
 
         if args.snapshot:
-            if snapshot := Snapshots().get_by_id(args.snapshot):
+            if snapshots := [
+                snapshot
+                for snapshot in Snapshots().get()
+                if args.snapshot == snapshot.id or args.snapshot == snapshot.name
+            ]:
+                if len(snapshots) > 1:
+                    log.error(f"multiple snapshots matched: {args.snapshot}")
+                    exit(1)
+
                 volume = Volume(
-                    source="snapshot", id=args.snapshot, ssdGb=snapshot.sizeGb
+                    source="snapshot", id=snapshots[0].id, ssdGb=snapshots[0].sizeGb
                 )
             else:
                 log.error(f"snapshot not found: {args.snapshot}")
                 exit(1)
         elif args.image:
-            if image := Images().get_by_id(args.image):
+            if images := [
+                image
+                for image in Images().get()
+                if args.image == image.id or args.image == image.name
+            ]:
+                if len(images) > 1:
+                    log.error(f"multiple images matched: {args.image}")
+                    exit(1)
+
                 volume = Volume(
-                    source="image", id=args.image, ssdGb=image.minimumSizeGb
+                    source="image", id=images[0].id, ssdGb=images[0].minimumSizeGb
                 )
             else:
                 log.error(f"image not found: {args.image}")
@@ -104,43 +120,50 @@ class Servers(Endpoint[Server]):
             log.error("missing mandatory option: password|sshkey")
             exit(1)
 
-        firewall_id = 0
-        if firewall := Firewalls().get_by_name(args.firewall):
-            firewall_id = firewall.id
-        if firewall_id:
-            payload = CreateRequestPayload(
-                name=args.name,
-                hostname=slugify(args.name),
-                flavorId=args.flavorid,
-                accessConfiguration=access_configuration,
-                volume=volume,
-                publicPortFirewallIds=[firewall_id],
-            )
-            self.create(payload)
-            if self.resources:
-                server_id = self.resources[0].id
-                if args.wait:
-                    if platform.system() == "Windows":
-                        signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
-                    with ThreadPoolExecutor() as executor:
-
-                        def wait(id: str, status: Status, seconds: int) -> None:
-                            while server := Servers().get_by_id(id):
-                                if server.status == status:
-                                    break
-                                time.sleep(seconds)
-
-                        future = executor.submit(wait, server_id, Status.ACTIVE, 30)
-                        try:
-                            future.result(timeout=300)
-                        except TimeoutError:
-                            future.cancel()
-                print(self.to_str(Servers().get_by_id(server_id)))
-            else:
-                log.error("failed to create server")
+        if firewalls := [
+            firewall
+            for firewall in Firewalls().get()
+            if args.firewall == firewall.id or args.firewall == firewall.name
+        ]:
+            if len(firewalls) > 1:
+                log.error(f"multiple firewalls matched: {args.firewall}")
                 exit(1)
+
+            firewall_id = firewalls[0].id
         else:
-            log.error(f"firewall not found {args.firewall}")
+            log.error(f"firewall not found: {args.firewall}")
+            exit(1)
+
+        payload = CreateRequestPayload(
+            name=args.name,
+            hostname=slugify(args.name),
+            flavorId=args.flavorid,
+            accessConfiguration=access_configuration,
+            volume=volume,
+            publicPortFirewallIds=[firewall_id],
+        )
+        self.create(payload)
+        if self.resources:
+            server_id = self.resources[0].id
+            if args.wait:
+                if platform.system() == "Windows":
+                    signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
+                with ThreadPoolExecutor() as executor:
+
+                    def wait(id: str, status: Status, seconds: int) -> None:
+                        while server := Servers().get_by_id(id):
+                            if server.status == status:
+                                break
+                            time.sleep(seconds)
+
+                    future = executor.submit(wait, server_id, Status.ACTIVE, 30)
+                    try:
+                        future.result(timeout=300)
+                    except TimeoutError:
+                        future.cancel()
+            print(self.to_str(Servers().get_by_id(server_id)))
+        else:
+            log.error("failed to create server")
             exit(1)
 
 

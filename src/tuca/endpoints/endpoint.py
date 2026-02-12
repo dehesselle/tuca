@@ -8,6 +8,7 @@ import logging
 from typing import Type, cast
 
 from pydantic import BaseModel, ValidationError
+from urlpath import URL
 
 from tuca.clouding import Clouding, DeleteResponse
 from tuca.config import config
@@ -26,7 +27,7 @@ class Endpoint[T: Resource]:
         self.clouding = Clouding()
         self.resources: list[T] = []
         self.component_type = component_type
-        self.endpoint = endpoint
+        self.endpoint = URL(endpoint)
         self.response_key = endpoint
 
     def create(self, payload: RequestPayload) -> list[T]:
@@ -56,7 +57,7 @@ class Endpoint[T: Resource]:
 
     def get_by_id(self, id: str) -> T | None:
         self.resources.clear()
-        self.clouding.get(self.endpoint + "/" + id)
+        self.clouding.get(self.endpoint / id)
         self.resources.extend(self._deserialize_response())
         return self.resources[0] if self.resources else None
 
@@ -87,7 +88,7 @@ class Endpoint[T: Resource]:
             resources = self.get()
         elif not isinstance(resources, list):
             resources = [resources]
-        result = {self.endpoint: [resource.model_dump() for resource in resources]}
+        result = {str(self.endpoint): [resource.model_dump() for resource in resources]}
         return self._to_str(result)
 
     def delete_resource(self, args: argparse.Namespace):
@@ -123,7 +124,7 @@ class Endpoint[T: Resource]:
     def _to_str(self, response: dict) -> str:
         if config.be_verbose:
             response["verbose"] = {
-                "endpoint": self.endpoint,
+                "endpoint": str(self.endpoint),
                 "status_code": self.clouding.response.status_code,
             }
             response["verbose"].update(

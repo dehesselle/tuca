@@ -61,7 +61,7 @@ class Clouding:
     def __init__(self):
         self.api_url = URL("https://api.clouding.io/v1")
         self.api_auth = {"X-API-KEY": get_token(None)}
-        self.endpoint = ""
+        self.endpoint = URL()
         self.query = ""
         self.response = requests.Response()
         self.response_header = ResponseHeader()
@@ -69,14 +69,14 @@ class Clouding:
         self.response_meta = ResponseMeta(total=0)
         self.delete_response = DeleteResponse(id="")
 
-    def get(self, endpoint: str):
+    def get(self, endpoint: URL):
         self.endpoint = endpoint
         self.response = requests.get(
             str(self.api_url / endpoint / "?pageSize=100"), headers=self.api_auth
         )
         self._post_processing()
 
-    def post(self, endpoint: str, payload: dict, headers: dict = {}):
+    def post(self, endpoint: URL, payload: dict, headers: dict = {}):
         self.endpoint = endpoint
         headers.update(self.api_auth)
         self.response = requests.post(
@@ -84,7 +84,7 @@ class Clouding:
         )
         self._post_processing()
 
-    def delete(self, endpoint: str, id: str):
+    def delete(self, endpoint: URL, id: str):
         self.endpoint = endpoint
         self.response = requests.delete(
             str(self.api_url / endpoint / id), headers=self.api_auth

@@ -9,6 +9,7 @@ from enum import StrEnum, auto
 from getpass import getpass
 
 import keyring
+import keyring.errors
 
 SERVICENAME = "CLOUDINGIO_API_TOKEN"
 USERNAME = "tuca"
@@ -31,11 +32,15 @@ def get_token(_) -> str:
         log.debug("auth via environment variable")
         return api_token
     else:
-        log.debug("auth via keyring")
-        if api_token := keyring.get_password(SERVICENAME, USERNAME):
-            return api_token
-        else:
-            log.error("no authentication")
+        try:
+            if api_token := keyring.get_password(SERVICENAME, USERNAME):
+                log.debug("auth via keyring")
+                return api_token
+            else:
+                log.error("no authentication available")
+                exit(1)
+        except keyring.errors.NoKeyringError:
+            log.error("no authentication available")
             exit(1)
 
 

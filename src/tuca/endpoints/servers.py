@@ -136,7 +136,7 @@ class Servers(Endpoint[Server]):
 
         payload = CreateRequestPayload(
             name=args.name,
-            hostname=slugify(args.name),
+            hostname=slugify(args.hostname if args.hostname else args.name),
             flavorId=args.flavorid,
             accessConfiguration=access_configuration,
             volume=volume,
@@ -187,6 +187,9 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
         Action.CREATE, help="create new server"
     )
     server_action_create.add_argument("--name", type=str, required=True)
+    server_action_create.add_argument(
+        "--hostname", type=str, required=False, default=""
+    )
     image_or_snapshot = server_action_create.add_mutually_exclusive_group(required=True)
     image_or_snapshot.add_argument("--snapshot", type=str, default="")
     image_or_snapshot.add_argument("--image", type=str, default="")

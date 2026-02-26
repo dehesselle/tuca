@@ -27,6 +27,8 @@ class Command(StrEnum):
     LIST = auto()
     CREATE = auto()
     DELETE = auto()
+    START = auto()
+    STOP = auto()
 
 
 class Status(StrEnum):
@@ -166,6 +168,14 @@ class Servers(Endpoint[Server]):
             log.error("failed to create server")
             exit(1)
 
+    def start(self, id: str):
+        self.clouding.post(self.endpoint / id / "start")
+        print(self._to_str(self._deserialize_action().as_dict))
+
+    def stop(self, id: str):
+        self.clouding.post(self.endpoint / id / "stop")
+        print(self._to_str(self._deserialize_action().as_dict))
+
 
 def create_server(args: argparse.Namespace):
     Servers().create_resource(args)
@@ -177,6 +187,34 @@ def delete_server(args: argparse.Namespace):
 
 def list_servers(args: argparse.Namespace):
     Servers().list_resources(args)
+
+
+def start_server(args: argparse.Namespace):
+    servers = Servers()
+    server = None
+    if hasattr(args, "id") and args.id:
+        server = servers.get_by_id(args.id)
+    elif hasattr(args, "name") and args.name:
+        server = servers.get_by_name(args.name)
+
+    if server:
+        servers.start(server.id)
+    else:
+        log.error("server not found")
+
+
+def stop_server(args: argparse.Namespace):
+    servers = Servers()
+    server = None
+    if hasattr(args, "id") and args.id:
+        server = servers.get_by_id(args.id)
+    elif hasattr(args, "name") and args.name:
+        server = servers.get_by_name(args.name)
+
+    if server:
+        servers.stop(server.id)
+    else:
+        log.error("server not found")
 
 
 def setup_servers_endpoint(subparser: argparse._SubParsersAction):
@@ -227,3 +265,15 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
         help="case-insensitive matching with name and id",
     )
     server_action_list.set_defaults(func=list_servers)
+
+    server_action_start = server_actions.add_parser(Command.START, help="start server")
+    id_or_name = server_action_start.add_mutually_exclusive_group(required=False)
+    id_or_name.add_argument("--id", type=str, default="")
+    id_or_name.add_argument("--name", type=str, default="")
+    server_action_start.set_defaults(func=start_server)
+
+    server_action_stop = server_actions.add_parser(Command.STOP, help="stop server")
+    id_or_name = server_action_stop.add_mutually_exclusive_group(required=False)
+    id_or_name.add_argument("--id", type=str, default="")
+    id_or_name.add_argument("--name", type=str, default="")
+    server_action_stop.set_defaults(func=stop_server)

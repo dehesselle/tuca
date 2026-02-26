@@ -2,5 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from .action import Action
 from .auth import setup_auth_cli
-from .clouding import Clouding, DeleteResponse
+from .clouding import Clouding

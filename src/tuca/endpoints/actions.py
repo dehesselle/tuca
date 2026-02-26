@@ -5,6 +5,8 @@
 import argparse
 from enum import StrEnum, auto
 
+from tuca.clouding import Action as NonResourceAction
+
 from .endpoint import Endpoint
 from .resource import IdentifiableResource
 
@@ -21,15 +23,10 @@ class Status(StrEnum):
 
 
 class Action(
-    IdentifiableResource
-):  # TODO: Action is not really a resource, but because of the current
-    # inheritance model, we're making it one. Better solution?
-    status: Status
-    type: str
-    startedAt: str
-    completedAt: str | None
-    resourceId: str
-    resourceType: str
+    NonResourceAction, IdentifiableResource
+):  # We're turning the Action from clouding.action module into a resource
+    # to make it compatible with our Endpoint infrastructure.
+    pass
 
 
 class Actions(Endpoint[Action]):

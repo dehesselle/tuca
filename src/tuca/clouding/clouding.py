@@ -7,38 +7,13 @@ import logging
 from http import HTTPStatus
 
 import requests
-from pydantic import BaseModel, Field
 from urlpath import URL
 
+from .action import Action
 from .auth import get_token
+from .response import ResponseHeader, ResponseLinks, ResponseMeta
 
 log = logging.getLogger("clouding")
-
-
-class ResponseHeader(BaseModel):
-    rate_limit_limit: str = Field(alias="X-Rate-Limit-Limit", default="")
-    rate_limit_remaining: str = Field(alias="X-Rate-Limit-Remaining", default="")
-    rate_limit_reset: str = Field(alias="X-Rate-Limit-Reset", default="")
-
-
-class DeleteResponse(BaseModel):
-    id: str
-    status: str = ""
-    startedAt: str = ""
-    resourceId: str = ""
-    resourceType: str = ""
-
-    def to_dict(self) -> dict:
-        return {"delete": [self.model_dump()]}
-
-
-class ResponseLinks(BaseModel):
-    next: str | None
-    previous: str | None
-
-
-class ResponseMeta(BaseModel):
-    total: int
 
 
 ValidStatusCodes = [
@@ -67,7 +42,7 @@ class Clouding:
         self.response_header = ResponseHeader()
         self.response_links = ResponseLinks(next=None, previous=None)
         self.response_meta = ResponseMeta(total=0)
-        self.delete_response = DeleteResponse(id="")
+        self.action = Action.new()
 
     def get(self, endpoint: URL):
         self.endpoint = endpoint
@@ -76,7 +51,7 @@ class Clouding:
         )
         self._post_processing()
 
-    def post(self, endpoint: URL, payload: dict, headers: dict = {}):
+    def post(self, endpoint: URL, payload: dict = {}, headers: dict = {}):
         self.endpoint = endpoint
         headers.update(self.api_auth)
         self.response = requests.post(
@@ -90,9 +65,10 @@ class Clouding:
             str(self.api_url / endpoint / id), headers=self.api_auth
         )
         if self.has_content:
-            self.delete_response = DeleteResponse.model_validate(self.response.json())
+            self.action = Action.model_validate(self.response.json())
         else:
-            self.delete_response.resourceId = id  # the only piece of info we got
+            log.error("does this really happen - only id?")
+            self.action.resourceId = id  # the only piece of info we got
         self._post_processing()
 
     def next(self) -> bool:
@@ -103,6 +79,10 @@ class Clouding:
             return True
         else:
             return False
+
+    @property
+    def is_status_not_found(self) -> bool:
+        return self.response.status_code == HTTPStatus.NOT_FOUND
 
     @property
     def is_status_ok(self) -> bool:

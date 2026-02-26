@@ -10,7 +10,7 @@ from typing import Type, cast
 from pydantic import BaseModel, ValidationError
 from urlpath import URL
 
-from tuca.clouding import Clouding, DeleteResponse
+from tuca.clouding import Action, Clouding
 from tuca.config import config
 
 from .resource import IdentifiableResource, NamedResource, Resource
@@ -23,10 +23,10 @@ class RequestPayload(BaseModel):
 
 
 class Endpoint[T: Resource]:
-    def __init__(self, component_type: Type[T], endpoint: str):
+    def __init__(self, resource_type: Type[T], endpoint: str):
         self.clouding = Clouding()
         self.resources: list[T] = []
-        self.component_type = component_type
+        self.resource_type = resource_type
         self.endpoint = URL(endpoint)
         self.response_key = endpoint
 
@@ -37,28 +37,28 @@ class Endpoint[T: Resource]:
             payload.model_dump(),
             headers={"Content-Type": "application/json"},
         )
-        self.resources.extend(self._deserialize_response())
+        self.resources.extend(self._deserialize_resources())
         return self.resources
 
-    def delete(self, id: str) -> DeleteResponse:
+    def delete(self, id: str) -> Action:
         self.resources.clear()
         self.clouding.delete(self.endpoint, id)
-        return self.clouding.delete_response
+        return self.clouding.action
 
     def get(self) -> list[T]:
         self.resources.clear()
         self.clouding.get(self.endpoint)
-        self.resources.extend(self._deserialize_response(self.response_key))
+        self.resources.extend(self._deserialize_resources(self.response_key))
         while (
             len(self.resources) < 100 and self.clouding.next()
         ):  # TODO configurable limit?
-            self.resources.extend(self._deserialize_response(self.response_key))
+            self.resources.extend(self._deserialize_resources(self.response_key))
         return self.resources
 
     def get_by_id(self, id: str) -> T | None:
         self.resources.clear()
         self.clouding.get(self.endpoint / id)
-        self.resources.extend(self._deserialize_response())
+        self.resources.extend(self._deserialize_resources())
         return self.resources[0] if self.resources else None
 
     def get_by_name(self, name: str) -> T | None:
@@ -101,8 +101,8 @@ class Endpoint[T: Resource]:
             resource_id = args.id
 
         if resource_id:
-            response = self.delete(resource_id)
-            print(self._to_str(response.to_dict()))
+            action = self.delete(resource_id)
+            print(self._to_str(action.as_dict))
         else:
             if args.name:
                 log.error(f"resource name not found: {args.name}")
@@ -138,13 +138,13 @@ class Endpoint[T: Resource]:
             sort_keys=True,
         )
 
-    def _deserialize_response(self, key: str = "") -> list[T]:
+    def _deserialize_resources(self, key: str = "") -> list[T]:
         result = []
         if self.clouding.is_status_ok:
             try:
                 result.extend(
                     [
-                        self.component_type.model_validate(_)
+                        self.resource_type.model_validate(_)
                         for _ in (
                             self.clouding.response.json()[key]
                             if key
@@ -154,14 +154,41 @@ class Endpoint[T: Resource]:
                 )
             except KeyError:
                 log.error(f"response.json lacks key: {key}")
+                log.error(self.clouding.response.json())
                 exit(1)
             except ValidationError:
                 log.error(f"unable to deserialize contents of: {key}")
                 exit(1)
+        elif self.clouding.is_status_not_found:
+            log.error("resource(s) not found")
+            exit(1)
         else:
             log.error(f"HTTP status: {self.clouding.response.status_code}")
             exit(1)
         return result
+
+    def _deserialize_action(self, key: str = "") -> Action:
+        if self.clouding.is_status_ok:
+            try:
+                self.action = Action.model_validate(
+                    self.clouding.response.json()[key]
+                    if key
+                    else self.clouding.response.json()
+                )
+            except KeyError:
+                log.error(f"response.json lacks action")
+                log.error(self.clouding.response.json())
+                exit(1)
+            except ValidationError:
+                log.error(f"unable to deserialize contents of action")
+                exit(1)
+        elif self.clouding.is_status_not_found:
+            log.error("resource not found")
+            exit(1)
+        else:
+            log.error(f"HTTP status: {self.clouding.response.status_code}")
+            exit(1)
+        return self.action
 
     @property
     def _by_id(

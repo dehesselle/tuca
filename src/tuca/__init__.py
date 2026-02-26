@@ -7,6 +7,7 @@ import argparse
 from tuca.clouding import setup_auth_cli
 from tuca.config import config
 from tuca.endpoints import (
+    setup_actions_endpoint,
     setup_firewalls_endpoint,
     setup_images_endpoint,
     setup_keypairs_endpoint,
@@ -31,6 +32,7 @@ def main() -> None:
     )
     parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
     endpoints = parser.add_subparsers(help="manageable endpoints", dest="endpoint")
+    setup_actions_endpoint(endpoints)
     setup_auth_cli(endpoints)
     setup_firewalls_endpoint(endpoints)
     setup_images_endpoint(endpoints)

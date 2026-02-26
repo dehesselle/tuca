@@ -58,7 +58,7 @@ First order of business is setting up an API token. You can do that via environm
 export CLOUDINGIO_API_TOKEN=my_secret_token
 ```
 
-Or, more securely, have tuca write it into your desktop's keyring. The following command will give you an interactive prompt to do that.
+Or, more securely, have tuca write it into your system's keyring. The following command will give you an interactive prompt to do that.
 
 ```bash
 tuca auth create
@@ -66,7 +66,7 @@ tuca auth create
 
 _And before you say anything, I'm aware that `auth` is not an endpoint._
 
-If you provide both, the environment variable takes precendence.
+If you provide both, the environment variable takes precedence.
 
 ### Create a server
 

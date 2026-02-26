@@ -37,7 +37,7 @@ def list_images(args: argparse.Namespace):
 def setup_images_endpoint(subparser: argparse._SubParsersAction):
     images = subparser.add_parser("images", help="manage images")
     images_actions = images.add_subparsers(help="available commands")
-    images_action_list = images_actions.add_parser(Command.LIST, help="list snapshots")
+    images_action_list = images_actions.add_parser(Command.LIST, help="list images")
     id_or_name = images_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")

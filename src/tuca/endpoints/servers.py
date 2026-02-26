@@ -23,7 +23,7 @@ from .snapshots import Snapshots
 log = logging.getLogger("servers")
 
 
-class Action(StrEnum):
+class Command(StrEnum):
     LIST = auto()
     CREATE = auto()
     DELETE = auto()
@@ -181,10 +181,10 @@ def list_servers(args: argparse.Namespace):
 
 def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     servers = subparser.add_parser("servers", help="manage servers")
-    server_actions = servers.add_subparsers(help="available actions")
+    server_actions = servers.add_subparsers(help="available commands")
 
     server_action_create = server_actions.add_parser(
-        Action.CREATE, help="create new server"
+        Command.CREATE, help="create new server"
     )
     server_action_create.add_argument("--name", type=str, required=True)
     server_action_create.add_argument(
@@ -208,14 +208,14 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     server_action_create.set_defaults(func=create_server)
 
     server_action_delete = server_actions.add_parser(
-        Action.DELETE, help="delete a server"
+        Command.DELETE, help="delete a server"
     )
     id_or_name = server_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
     server_action_delete.set_defaults(func=delete_server)
 
-    server_action_list = server_actions.add_parser(Action.LIST, help="list servers")
+    server_action_list = server_actions.add_parser(Command.LIST, help="list servers")
     id_or_name = server_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")

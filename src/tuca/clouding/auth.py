@@ -17,7 +17,7 @@ USERNAME = "tuca"
 log = logging.getLogger("auth")
 
 
-class Action(StrEnum):
+class Command(StrEnum):
     CREATE = auto()
     DELETE = auto()
 
@@ -52,10 +52,10 @@ def setup_auth_cli(subparser: _SubParsersAction):
     auth = subparser.add_parser("auth", help="manage authentication token")
     auth_actions = auth.add_subparsers()
     auth_action_set = auth_actions.add_parser(
-        Action.CREATE, help="set authentication token"
+        Command.CREATE, help="set authentication token"
     )
     auth_action_set.set_defaults(func=set_token)
     auth_action_delete = auth_actions.add_parser(
-        Action.DELETE, help="delete authentication token"
+        Command.DELETE, help="delete authentication token"
     )
     auth_action_delete.set_defaults(func=delete_token)

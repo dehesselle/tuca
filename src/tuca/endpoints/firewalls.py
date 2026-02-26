@@ -9,7 +9,7 @@ from .endpoint import Endpoint
 from .resource import NamedResource
 
 
-class Action(StrEnum):
+class Command(StrEnum):
     LIST = auto()
 
 
@@ -29,10 +29,10 @@ def list_firewalls(args: argparse.Namespace):
 
 def setup_firewalls_endpoint(subparser: argparse._SubParsersAction):
     firewalls = subparser.add_parser("firewalls", help="manage firewalls")
-    firewall_actions = firewalls.add_subparsers(help="available actions")
+    firewall_actions = firewalls.add_subparsers(help="available commands")
 
     firewall_action_list = firewall_actions.add_parser(
-        Action.LIST, help="list firewalls"
+        Command.LIST, help="list firewalls"
     )
     id_or_name = firewall_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")

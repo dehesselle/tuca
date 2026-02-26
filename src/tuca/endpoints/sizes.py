@@ -9,7 +9,7 @@ from .endpoint import Endpoint
 from .resource import IdentifiableResource, Resource
 
 
-class Action(StrEnum):
+class Command(StrEnum):
     LIST = auto()
 
 
@@ -54,15 +54,15 @@ def list_sizes(args: argparse.Namespace):
 
 def setup_sizes_endpoint(subparser: argparse._SubParsersAction):
     volumesizes = subparser.add_parser("volumesizes", help="query volume sizes")
-    volumesizes_actions = volumesizes.add_subparsers(help="available actions")
+    volumesizes_actions = volumesizes.add_subparsers(help="available commands")
     volumesizes_action_list = volumesizes_actions.add_parser(
-        Action.LIST, help="list volume sizes"
+        Command.LIST, help="list volume sizes"
     )
     volumesizes_action_list.set_defaults(func=list_sizes)
 
     flavors = subparser.add_parser("flavors", help="query cpu/memory sizes")
-    flavors_actions = flavors.add_subparsers(help="available actions")
+    flavors_actions = flavors.add_subparsers(help="available commands")
     flavors_action_list = flavors_actions.add_parser(
-        Action.LIST, help="list server sizes"
+        Command.LIST, help="list server sizes"
     )
     flavors_action_list.set_defaults(func=list_flavors)

@@ -10,7 +10,7 @@ from .images import Image
 from .resource import NamedResource
 
 
-class Action(StrEnum):
+class Command(StrEnum):
     LIST = auto()
 
 
@@ -31,9 +31,9 @@ def list_snapshots(args: argparse.Namespace):
 
 def setup_snapshots_endpoint(subparser: argparse._SubParsersAction):
     snapshots = subparser.add_parser("snapshots", help="manage snapshots")
-    snapshot_actions = snapshots.add_subparsers(help="available actions")
+    snapshot_actions = snapshots.add_subparsers(help="available commands")
     snapshot_action_list = snapshot_actions.add_parser(
-        Action.LIST, help="list snapshots"
+        Command.LIST, help="list snapshots"
     )
     id_or_name = snapshot_action_list.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")

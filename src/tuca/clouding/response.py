@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from typing import Self
-
 from pydantic import BaseModel, Field
 
 
@@ -32,9 +30,3 @@ class Meta(BaseModel):
 class Pagination(BaseModel):
     links: Links = Field(default=Links(next=None, previous=None))
     meta: Meta = Field(default=Meta(total=0))
-
-    @classmethod
-    def new(
-        cls, links: Links = Links(next=None, previous=None), meta: Meta = Meta(total=0)
-    ) -> Self:
-        return cls(links=links, meta=meta)

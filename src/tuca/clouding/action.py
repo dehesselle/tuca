@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from enum import StrEnum, auto
-from typing import Self
 
 from pydantic import BaseModel
 
@@ -37,24 +36,3 @@ class Action(BaseModel):
     @property
     def as_dict(self) -> dict:
         return {"actions": [self.model_dump()]}
-
-    @classmethod
-    def new(
-        cls,
-        id: str = "",
-        status: Status = Status.ERRORED,
-        type: str = "",
-        startedAt: str = "",
-        completedAt: str | None = None,
-        resourceId="",
-        resourceType="",
-    ) -> Self:
-        return cls(
-            id=id,
-            status=status,
-            type=type,
-            startedAt=startedAt,
-            completedAt=completedAt,
-            resourceId=resourceId,
-            resourceType=resourceType,
-        )

@@ -46,13 +46,13 @@ class Clouding:
     def __init__(self):
         self.api_url = URL("https://api.clouding.io/v1")
         self.api_auth = {"X-API-KEY": get_token(None)}
-        self.endpoint = URL()
+        self.endpoint = URL("")
         self.query = ""
         self.response = requests.Response()
         self.response_header = ResponseHeader()
         self.response_page_size = 100
-        self.pagination = Pagination.new()
-        self.action = Action.new()
+        self.pagination = Pagination()
+        self.action: Action
 
     def get(self, endpoint: URL):
         self.endpoint = endpoint

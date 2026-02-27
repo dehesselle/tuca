@@ -28,6 +28,12 @@ class VolumeSize(Resource):
 
 
 class Flavors(Endpoint[Flavor]):
+    """server `sizes`_
+
+    .. _sizes:
+       https://api.clouding.io/docs/#tag/Sizes/operation/ListAllFlavors
+    """
+
     def __init__(self):
         super().__init__(Flavor, "sizes/flavors")
         self.response_key = "flavors"
@@ -39,6 +45,12 @@ class Flavors(Endpoint[Flavor]):
 
 
 class Sizes(Endpoint[VolumeSize]):
+    """volume `sizes`_
+
+    .. _sizes:
+      https://api.clouding.io/docs/#tag/Sizes/operation/ListAllVolumeSizes
+    """
+
     def __init__(self):
         super().__init__(VolumeSize, "sizes/volumes")
         self.response_key = "volumeSizes"

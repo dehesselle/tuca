@@ -30,6 +30,13 @@ class Action(
 
 
 class Actions(Endpoint[Action]):
+    """
+    Interact with the `actions`_ endpoint.
+
+    .. _actions:
+       https://api.clouding.io/docs/#tag/Actions
+    """
+
     def __init__(self):
         super().__init__(Action, "actions")
 

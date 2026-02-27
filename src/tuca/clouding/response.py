@@ -28,5 +28,11 @@ class Meta(BaseModel):
 
 
 class Pagination(BaseModel):
+    """`pagination`_
+
+    .. _pagination:
+       https://api.clouding.io/docs/#section/Introduction/Pagination
+    """
+
     links: Links = Field(default=Links(next=None, previous=None))
     meta: Meta = Field(default=Meta(total=0))

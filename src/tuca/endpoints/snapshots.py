@@ -21,6 +21,13 @@ class Snapshot(NamedResource):
 
 
 class Snapshots(Endpoint[Snapshot]):
+    """
+    Interact with the `snapshots`_ endpoint.
+
+    .. _snapshots:
+       https://api.clouding.io/docs/#tag/Snapshots
+    """
+
     def __init__(self):
         super().__init__(Snapshot, "snapshots")
 

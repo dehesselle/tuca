@@ -20,6 +20,12 @@ class Keypair(NamedResource):
 
 
 class Keypairs(Endpoint[Keypair]):
+    """ssh `keys`_
+
+    .. _keys:
+       https://api.clouding.io/docs/#tag/SSH-Keys
+    """
+
     def __init__(self):
         super().__init__(Keypair, "keypairs")
         self.response_key = "values"

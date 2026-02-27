@@ -26,6 +26,13 @@ class Image(NamedResource):
 
 
 class Images(Endpoint[Image]):
+    """
+    Interact with the `images`_ endpoint.
+
+    .. _images:
+       https://api.clouding.io/docs/#tag/Images
+    """
+
     def __init__(self):
         super().__init__(Image, "images")
 

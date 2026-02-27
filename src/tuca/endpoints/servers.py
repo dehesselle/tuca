@@ -71,6 +71,13 @@ class Server(NamedResource):
 
 
 class Servers(Endpoint[Server]):
+    """
+    Interact with the `servers`_ endpoint.
+
+    .. _servers:
+       https://api.clouding.io/docs/#tag/Servers
+    """
+
     def __init__(self):
         super().__init__(Server, "servers")
 

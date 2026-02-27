@@ -18,6 +18,13 @@ class Firewall(NamedResource):
 
 
 class Firewalls(Endpoint[Firewall]):
+    """
+    Interact with the `firewalls`_ endpoint.
+
+    .. _firewalls:
+       https://api.clouding.io/docs/#tag/Firewalls
+    """
+
     def __init__(self):
         super().__init__(Firewall, "firewalls")
         self.response_key = "values"

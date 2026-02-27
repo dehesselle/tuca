@@ -8,6 +8,8 @@ from pydantic import BaseModel
 
 
 class Resource(BaseModel):
+    """generalized base class for all resources"""
+
     pass
 
     @property
@@ -20,8 +22,12 @@ class Resource(BaseModel):
 
 
 class IdentifiableResource(Resource):
+    """base for resources with `id` property"""
+
     id: str
 
 
 class NamedResource(IdentifiableResource):
+    """base for resources with `id` and `name` properties"""
+
     name: str

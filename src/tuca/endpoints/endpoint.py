@@ -23,6 +23,8 @@ class RequestPayload(BaseModel):
 
 
 class Endpoint[T: Resource]:
+    """base class for all endpoints"""
+
     def __init__(self, resource_type: Type[T], endpoint: str):
         self.clouding = Clouding()
         self.resources: list[T] = []

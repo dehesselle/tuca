@@ -22,7 +22,7 @@ The CLI interface follows this pattern:
 tuca <endpoint> <action> [options]
 ```
 
-- `endpoint` is the same as in https://api.clouding.io/docs/  
+- `endpoint` is the same as in the [API documentation](https://api.clouding.io/docs/)  
   💁 _Not all endpoints are supported!_
 - `action` is one of `create`, `list` and `delete`  
   💁 _Supported actions depend on endpoint!_
@@ -139,6 +139,7 @@ tuca images list --filter windows
     ]
 }
 ```
+
 </details>
 
 Now pick one of the available flavors (server sizes).
@@ -150,7 +151,7 @@ tuca flavors list
 <details>
 <summary>Output</summary>
 
-_(modified/shortened for brevity)_
+_(output shortened)_
 
 ```json
 {
@@ -167,6 +168,7 @@ _(modified/shortened for brevity)_
     ]
 }
 ```
+
 </details>
 
 That's sufficient to create a server with minimal configuration.
@@ -186,15 +188,25 @@ tuca servers create --image jXEm7yK3MJ2VYkQ9 --name MyWinServer --flavorid 8x16 
 {
     "servers": [
         {
-            "createdAt": "2026-02-04T23:42:16",
-            "id": "mJOZBKqGP702Xjax",
+            "action": {
+                "completedAt": null,
+                "id": "BEVPodeblJYKJv7a",
+                "resourceId": "R0XZEKlWEAMdWbQj",
+                "resourceType": "server",
+                "startedAt": "2026-02-28T14:38:52.312803Z",
+                "status": "inProgress",
+                "type": "create"
+            },
+            "createdAt": "",
+            "id": "R0XZEKlWEAMdWbQj",
             "name": "MyWinServer",
-            "publicIp": null,
+            "publicIp": "",
             "status": "Pending"
         }
     ]
 }
 ```
+
 </details>
 
 Spooling up the server can take some time and you can check how it's doing.
@@ -202,6 +214,7 @@ Spooling up the server can take some time and you can check how it's doing.
 ```bash
 tuca servers list --name MyWinServer
 ```
+
 <details>
 <summary>Output</summary>
 
@@ -209,15 +222,16 @@ tuca servers list --name MyWinServer
 {
     "servers": [
         {
-            "createdAt": "2026-02-04T23:42:16",
-            "id": "mJOZBKqGP702Xjax",
+            "createdAt": "2026-02-28T14:38:52",
+            "id": "R0XZEKlWEAMdWbQj",
             "name": "MyWinServer",
-            "publicIp": "103.23.60.115",
+            "publicIp": null,
             "status": "Creating"
         }
     ]
 }
 ```
+
 </details>
 
 The server will be ready eventually.
@@ -238,6 +252,7 @@ The server will be ready eventually.
     ]
 }
 ```
+
 </details>
 
 ## License

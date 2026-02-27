@@ -11,8 +11,12 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from enum import StrEnum, auto
 
 from pydantic import BaseModel
+from pydantic.experimental.missing_sentinel import (
+    MISSING,  # https://docs.pydantic.dev/dev/concepts/experimental/#missing-sentinel
+)
 from slugify import slugify
 
+from .actions import Action
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
 from .images import Images
@@ -63,6 +67,7 @@ class Server(NamedResource):
     createdAt: str = ""
     publicIp: str | None = ""
     status: str
+    action: Action | MISSING = MISSING
 
 
 class Servers(Endpoint[Server]):
@@ -146,24 +151,23 @@ class Servers(Endpoint[Server]):
         )
         self.create(payload)
         if self.resources:
-            server_id = self.resources[0].id
             if args.wait:
                 if platform.system() == "Windows":
                     signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
                 with ThreadPoolExecutor() as executor:
 
-                    def wait(id: str, status: Status, seconds: int) -> None:
-                        while server := Servers().get_by_id(id):
+                    def wait(servers: Servers, status: Status, seconds: int) -> None:
+                        while server := servers.get_by_id(servers.resources[0].id):
                             if server.status == status:
                                 break
                             time.sleep(seconds)
 
-                    future = executor.submit(wait, server_id, Status.ACTIVE, 30)
+                    future = executor.submit(wait, self, Status.ACTIVE, 30)
                     try:
                         future.result(timeout=300)
                     except TimeoutError:
                         future.cancel()
-            print(self.to_str(Servers().get_by_id(server_id)))
+            print(self.to_str(self.resources))
         else:
             log.error("failed to create server")
             exit(1)

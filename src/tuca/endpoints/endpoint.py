@@ -49,9 +49,7 @@ class Endpoint[T: Resource]:
         self.resources.clear()
         self.clouding.get(self.endpoint)
         self.resources.extend(self._deserialize_resources(self.response_key))
-        while (
-            len(self.resources) < 100 and self.clouding.next()
-        ):  # TODO configurable limit?
+        while self.clouding.next():  # pagination
             self.resources.extend(self._deserialize_resources(self.response_key))
         return self.resources
 
@@ -102,7 +100,8 @@ class Endpoint[T: Resource]:
 
         if resource_id:
             action = self.delete(resource_id)
-            print(self._to_str(action.as_dict))
+            if action.id:  # not every delete request produces an action
+                print(self._to_str(action.as_dict))
         else:
             if args.name:
                 log.error(f"resource name not found: {args.name}")

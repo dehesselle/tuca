@@ -11,7 +11,7 @@ from urlpath import URL
 
 from .action import Action
 from .auth import get_token
-from .response import ResponseHeader, ResponseLinks, ResponseMeta
+from .response import Pagination, ResponseHeader
 
 log = logging.getLogger("clouding")
 
@@ -33,6 +33,16 @@ ValidStatusCodes = [
 
 
 class Clouding:
+    """low-level API wrapper
+
+    This class wraps the basic operations from the requests package and adds some
+    Clouding specifics (authentication, simple pagination).
+    See the `introduction`_ section of the documentation.
+
+    .. _introduction:
+       https://api.clouding.io/docs/#section/Introduction
+    """
+
     def __init__(self):
         self.api_url = URL("https://api.clouding.io/v1")
         self.api_auth = {"X-API-KEY": get_token(None)}
@@ -40,16 +50,17 @@ class Clouding:
         self.query = ""
         self.response = requests.Response()
         self.response_header = ResponseHeader()
-        self.response_links = ResponseLinks(next=None, previous=None)
-        self.response_meta = ResponseMeta(total=0)
+        self.response_page_size = 100
+        self.pagination = Pagination.new()
         self.action = Action.new()
 
     def get(self, endpoint: URL):
         self.endpoint = endpoint
         self.response = requests.get(
-            str(self.api_url / endpoint / "?pageSize=100"), headers=self.api_auth
+            str(self.api_url / endpoint / f"?pageSize={self.response_page_size}"),
+            headers=self.api_auth,
         )
-        self._post_processing()
+        self._process_response()
 
     def post(self, endpoint: URL, payload: dict = {}, headers: dict = {}):
         self.endpoint = endpoint
@@ -57,7 +68,7 @@ class Clouding:
         self.response = requests.post(
             str(self.api_url / endpoint), data=json.dumps(payload), headers=headers
         )
-        self._post_processing()
+        self._process_response()
 
     def delete(self, endpoint: URL, id: str):
         self.endpoint = endpoint
@@ -66,16 +77,12 @@ class Clouding:
         )
         if self.has_content:
             self.action = Action.model_validate(self.response.json())
-        else:
-            log.error("does this really happen - only id?")
-            self.action.resourceId = id  # the only piece of info we got
-        self._post_processing()
+        self._process_response()
 
     def next(self) -> bool:
-        if url := self.response_links.next:
-            print(self.response_links.next)
+        if url := self.pagination.links.next:
             self.response = requests.get(url, headers=self.api_auth)
-            self._post_processing()
+            self._process_response()
             return True
         else:
             return False
@@ -101,18 +108,7 @@ class Clouding:
     def has_content(self) -> bool:
         return self.is_status_ok and self.response.status_code != HTTPStatus.NO_CONTENT
 
-    def _post_processing(self):
-        if self.is_status_valid:
+    def _process_response(self):
+        if self.has_content:
             self.response_header = ResponseHeader.model_validate(self.response.headers)
-            try:
-                self.response_links = ResponseLinks.model_validate(
-                    self.response.json()["links"]
-                )
-                self.response_meta = ResponseMeta.model_validate(
-                    self.response.json()["meta"]
-                )
-            except KeyError:
-                pass  # non-paginated responses don't have links and meta
-        else:
-            log.error(f"invalid HTTP status: {self.response.status_code}")
-            exit(1)
+            self.pagination = Pagination.model_validate(self.response.json())

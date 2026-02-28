@@ -2,5 +2,14 @@
   "python.analysis.typeCheckingMode": "standard",
   // "Added support for Sentinel type introduced in draft PEP 661."
   // https://github.com/microsoft/pyright/releases/tag/1.1.402
-  "python.analysis.typeEvaluation.enableExperimentalFeatures": true
+  "python.analysis.typeEvaluation.enableExperimentalFeatures": true,
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    }
+  },
+  "isort.args": [
+    "--profile",
+    "black"
+  ],
 }

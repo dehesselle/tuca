@@ -57,11 +57,11 @@ def list_keypairs(args: argparse.Namespace):
 
 
 def setup_keypairs_endpoint(subparser: argparse._SubParsersAction):
-    snapshots = subparser.add_parser("keypairs", help="manage keypairs")
+    snapshots = subparser.add_parser("keypairs", help="manage SSH keys")
     keypair_actions = snapshots.add_subparsers(help="available commands")
 
     keypair_action_create = keypair_actions.add_parser(
-        Command.CREATE, help="create new server"
+        Command.CREATE, help="create new SSH key"
     )
     keypair_action_create.add_argument("--name", type=str, required=True)
     keypair_action_create.add_argument("--publickey", type=str, required=True)
@@ -69,14 +69,14 @@ def setup_keypairs_endpoint(subparser: argparse._SubParsersAction):
     keypair_action_create.set_defaults(func=create_keypair)
 
     keypair_action_delete = keypair_actions.add_parser(
-        Command.DELETE, help="delete a server"
+        Command.DELETE, help="delete SSH key"
     )
     id_or_name = keypair_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
     keypair_action_delete.set_defaults(func=delete_keypair)
 
-    keypair_action_list = keypair_actions.add_parser(Command.LIST, help="list keypairs")
+    keypair_action_list = keypair_actions.add_parser(Command.LIST, help="list SSH keys")
     keypair_action_list.add_argument("-i", "--id", default="", required=False)
     keypair_action_list.add_argument(
         "--filter",

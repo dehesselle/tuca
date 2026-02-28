@@ -65,16 +65,16 @@ def list_sizes(args: argparse.Namespace):
 
 
 def setup_sizes_endpoint(subparser: argparse._SubParsersAction):
-    volumesizes = subparser.add_parser("volumesizes", help="query volume sizes")
+    volumesizes = subparser.add_parser("volumesizes", help="volume sizes")
     volumesizes_actions = volumesizes.add_subparsers(help="available commands")
     volumesizes_action_list = volumesizes_actions.add_parser(
         Command.LIST, help="list volume sizes"
     )
     volumesizes_action_list.set_defaults(func=list_sizes)
 
-    flavors = subparser.add_parser("flavors", help="query cpu/memory sizes")
+    flavors = subparser.add_parser("flavors", help="cpu/memory combinations")
     flavors_actions = flavors.add_subparsers(help="available commands")
     flavors_action_list = flavors_actions.add_parser(
-        Command.LIST, help="list server sizes"
+        Command.LIST, help="list available flavors"
     )
     flavors_action_list.set_defaults(func=list_flavors)

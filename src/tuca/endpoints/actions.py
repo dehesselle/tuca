@@ -46,7 +46,7 @@ def list_actions(args: argparse.Namespace):
 
 
 def setup_actions_endpoint(subparser: argparse._SubParsersAction):
-    actions = subparser.add_parser("actions", help="list actions")
+    actions = subparser.add_parser("actions", help="long-running actions")
     snapshot_actions = actions.add_subparsers(help="available commands")
     snapshot_action_list = snapshot_actions.add_parser(
         Command.LIST, help="list actions"

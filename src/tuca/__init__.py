@@ -22,7 +22,7 @@ from tuca.version import VERSION
 def main() -> None:
     setup_logging()
 
-    parser = argparse.ArgumentParser(description="unofficial CLI for Clouding.io")
+    parser = argparse.ArgumentParser(description="(unofficial) CLI for Clouding.io")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -31,7 +31,7 @@ def main() -> None:
         help="make output verbose",
     )
     parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
-    endpoints = parser.add_subparsers(help="manageable endpoints", dest="endpoint")
+    endpoints = parser.add_subparsers(dest="endpoint", help="manageable resources")
     setup_actions_endpoint(endpoints)
     setup_auth_cli(endpoints)
     setup_firewalls_endpoint(endpoints)

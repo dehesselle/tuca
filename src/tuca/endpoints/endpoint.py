@@ -11,7 +11,6 @@ from pydantic import BaseModel, ValidationError
 from urlpath import URL
 
 from tuca.clouding import Action, Clouding
-from tuca.config import config
 
 from .resource import IdentifiableResource, NamedResource, Resource
 
@@ -24,6 +23,8 @@ class RequestPayload(BaseModel):
 
 class Endpoint[T: Resource]:
     """base class for all endpoints"""
+
+    be_verbose: bool = False
 
     def __init__(self, resource_type: Type[T], endpoint: str):
         self.clouding = Clouding()
@@ -123,7 +124,7 @@ class Endpoint[T: Resource]:
             print(self.to_str())
 
     def _to_str(self, response: dict) -> str:
-        if config.be_verbose:
+        if self.be_verbose:
             response["verbose"] = {
                 "endpoint": str(self.endpoint),
                 "status_code": self.clouding.response.status_code,

@@ -5,7 +5,6 @@
 import argparse
 
 from tuca.clouding import setup_auth_cli
-from tuca.config import config
 from tuca.endpoints import (
     setup_actions_endpoint,
     setup_firewalls_endpoint,
@@ -15,6 +14,7 @@ from tuca.endpoints import (
     setup_sizes_endpoint,
     setup_snapshots_endpoint,
 )
+from tuca.endpoints.endpoint import Endpoint
 from tuca.log import setup_logging
 from tuca.version import VERSION
 
@@ -42,7 +42,7 @@ def main() -> None:
     setup_sizes_endpoint(endpoints)
 
     args = parser.parse_args()
-    config.be_verbose = args.verbose
+    Endpoint.be_verbose = args.verbose
     try:
         args.func(args)
     except AttributeError:

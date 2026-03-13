@@ -9,7 +9,7 @@ from enum import StrEnum, auto
 from getpass import getpass
 
 import keyring
-import keyring.errors
+from keyring.errors import NoKeyringError
 
 SERVICENAME = "CLOUDINGIO_API_TOKEN"
 USERNAME = "tuca"
@@ -24,7 +24,11 @@ class Command(StrEnum):
 
 def set_token(_) -> None:
     token = getpass("API token:")
-    keyring.set_password(SERVICENAME, USERNAME, token)
+    try:
+        keyring.set_password(SERVICENAME, USERNAME, token)
+    except NoKeyringError:
+        log.error("no keyring available")
+        exit(1)
 
 
 def get_token(_) -> str:
@@ -39,7 +43,7 @@ def get_token(_) -> str:
             else:
                 log.error("no authentication available")
                 exit(1)
-        except keyring.errors.NoKeyringError:
+        except NoKeyringError:
             log.error("no authentication available")
             exit(1)
 

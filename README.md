@@ -1,6 +1,6 @@
 # tool using Clouding.io API
 
-This is an unofficial CLI that interacts with Clouding.io's REST API. Its main goal is to provide a simple interface that can be used to create and destroy servers from shell scripts. It neither provides access to all API endpoints nor to all attributes and/or actions.
+This is an unofficial CLI that interacts with Clouding.io's REST API. Its main purpose is to provide a simple interface to create and destroy servers from snapshots. It neither provides access to all API endpoints nor to all attributes and/or actions.
 
 The project status is best described as "alpha" as things are still very much in motion.
 
@@ -45,7 +45,7 @@ tuca <endpoint> <action> [options]
 
 The output is
 
-- always organized as list, even if the result count is 1 or 0
+- always presented as list, even if the result count is 1 or 0
 - usually named after the endpoint
 - contains an opionated subset of the available attributes, but always `id` and `name`
 - limited to a maximum of 100 entries
@@ -58,15 +58,13 @@ First order of business is setting up an API token. You can do that via environm
 export CLOUDINGIO_API_TOKEN=my_secret_token
 ```
 
-Or, more securely, have tuca write it into your system's keyring. The following command will give you an interactive prompt to do that.
+Or, more securely, have tuca write it into your system's keyring. The following command will give you an interactive prompt to do that:
 
 ```bash
 tuca auth create
 ```
 
-_And before you say anything, I'm aware that `auth` is not an endpoint._
-
-If you provide both, the environment variable takes precedence.
+If credentials are present in both keyring and environment, the environment variable takes precedence.
 
 ### Create a server
 
@@ -209,7 +207,7 @@ tuca servers create --image jXEm7yK3MJ2VYkQ9 --name MyWinServer --flavorid 8x16 
 
 </details>
 
-Spooling up the server can take some time and you can check how it's doing.
+Creating the server can take some time and you can check how it's doing.
 
 ```bash
 tuca servers list --name MyWinServer

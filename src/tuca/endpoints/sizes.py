@@ -44,7 +44,7 @@ class Flavors(Endpoint[Flavor]):
         return [flavor.id for flavor in self.resources]
 
 
-class Sizes(Endpoint[VolumeSize]):
+class VolumeSizes(Endpoint[VolumeSize]):
     """volume `sizes`_
 
     .. _sizes:
@@ -55,13 +55,18 @@ class Sizes(Endpoint[VolumeSize]):
         super().__init__(VolumeSize, "sizes/volumes")
         self.response_key = "volumeSizes"
 
+    @property
+    def all(self) -> list[int]:
+        self.get()
+        return [volumesize.sizeGb for volumesize in self.resources]
+
 
 def list_flavors(args: argparse.Namespace):
     Flavors().list_resources(args)
 
 
-def list_sizes(args: argparse.Namespace):
-    Sizes().list_resources(args)
+def list_volume_sizes(args: argparse.Namespace):
+    VolumeSizes().list_resources(args)
 
 
 def setup_sizes_endpoint(subparser: argparse._SubParsersAction):
@@ -70,7 +75,7 @@ def setup_sizes_endpoint(subparser: argparse._SubParsersAction):
     volumesizes_action_list = volumesizes_actions.add_parser(
         Command.LIST, help="list volume sizes"
     )
-    volumesizes_action_list.set_defaults(func=list_sizes)
+    volumesizes_action_list.set_defaults(func=list_volume_sizes)
 
     flavors = subparser.add_parser("flavors", help="cpu/memory combinations")
     flavors_actions = flavors.add_subparsers(help="available commands")

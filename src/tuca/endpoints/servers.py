@@ -21,7 +21,7 @@ from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
 from .images import Images
 from .resource import NamedResource
-from .sizes import Flavors
+from .sizes import Flavors, VolumeSizes
 from .snapshots import Snapshots
 
 log = logging.getLogger("servers")
@@ -83,7 +83,7 @@ class Servers(Endpoint[Server]):
 
     def create_resource(self, args):
         if args.flavorid not in Flavors().all:
-            log.error(f"flavor not found: {args.flavorid}")
+            log.error(f"flavor not supported: {args.flavorid}")
             exit(1)
 
         if args.snapshot:
@@ -121,6 +121,12 @@ class Servers(Endpoint[Server]):
         else:
             log.error("missing mandatory option: snapshot|image")
             exit(1)
+
+        if args.ssdgb:
+            if args.ssdgb not in VolumeSizes().all:
+                log.error(f"volume size not supported: {args.ssdgb}")
+                exit(1)
+            volume.ssdGb = args.ssdgb
 
         if args.password:
             access_configuration = AccessConfiguration(
@@ -242,6 +248,9 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     image_or_snapshot = server_action_create.add_mutually_exclusive_group(required=True)
     image_or_snapshot.add_argument("--snapshot", type=str, default="")
     image_or_snapshot.add_argument("--image", type=str, default="")
+    server_action_create.add_argument(
+        "--ssdgb", type=int, required=False, default=0, help="size of system disk"
+    )
     server_action_create.add_argument("--flavorid", type=str, required=True)
     server_action_create.add_argument(
         "--firewall", type=str, required=False, default="default"

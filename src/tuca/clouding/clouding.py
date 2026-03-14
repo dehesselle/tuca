@@ -44,36 +44,35 @@ class Clouding:
     """
 
     def __init__(self):
-        self.api_url = URL("https://api.clouding.io/v1")
-        self.api_auth = {"X-API-KEY": get_token(None)}
-        self.endpoint = URL("")
-        self.query = ""
+        self.base_url = URL("https://api.clouding.io/v1")
+        self.authentication = {"X-API-KEY": get_token(None)}
+        self.resource = URL("")
         self.response = requests.Response()
         self.response_header = ResponseHeader()
         self.response_page_size = 100
         self.pagination = Pagination()
         self.action: Action
 
-    def get(self, endpoint: URL):
-        self.endpoint = endpoint
+    def get(self, resource: URL):
+        self.resource = resource
         self.response = requests.get(
-            str(self.api_url / endpoint / f"?pageSize={self.response_page_size}"),
-            headers=self.api_auth,
+            str(self.base_url / resource / f"?pageSize={self.response_page_size}"),
+            headers=self.authentication,
         )
         self._process_response()
 
-    def post(self, endpoint: URL, payload: dict = {}, headers: dict = {}):
-        self.endpoint = endpoint
-        headers.update(self.api_auth)
+    def post(self, resource: URL, payload: dict = {}, headers: dict = {}):
+        self.resource = resource
+        headers.update(self.authentication)
         self.response = requests.post(
-            str(self.api_url / endpoint), data=json.dumps(payload), headers=headers
+            str(self.base_url / resource), data=json.dumps(payload), headers=headers
         )
         self._process_response()
 
-    def delete(self, endpoint: URL, id: str):
-        self.endpoint = endpoint
+    def delete(self, resource: URL, id: str):
+        self.resource = resource
         self.response = requests.delete(
-            str(self.api_url / endpoint / id), headers=self.api_auth
+            str(self.base_url / resource / id), headers=self.authentication
         )
         if self.has_content:
             self.action = Action.model_validate(self.response.json())
@@ -81,7 +80,7 @@ class Clouding:
 
     def next(self) -> bool:
         if url := self.pagination.links.next:
-            self.response = requests.get(url, headers=self.api_auth)
+            self.response = requests.get(url, headers=self.authentication)
             self._process_response()
             return True
         else:

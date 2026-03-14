@@ -26,17 +26,17 @@ class Endpoint[T: Resource]:
 
     be_verbose: bool = False
 
-    def __init__(self, resource_type: Type[T], endpoint: str):
+    def __init__(self, resource_type: Type[T], resource: str):
         self.clouding = Clouding()
         self.resources: list[T] = []
         self.resource_type = resource_type
-        self.endpoint = URL(endpoint)
-        self.response_key = endpoint
+        self.resource = URL(resource)
+        self.response_key = resource
 
     def create(self, payload: RequestPayload) -> list[T]:
         self.resources.clear()
         self.clouding.post(
-            self.endpoint,
+            self.resource,
             payload.model_dump(),
             headers={"Content-Type": "application/json"},
         )
@@ -45,12 +45,12 @@ class Endpoint[T: Resource]:
 
     def delete(self, id: str) -> Action:
         self.resources.clear()
-        self.clouding.delete(self.endpoint, id)
+        self.clouding.delete(self.resource, id)
         return self.clouding.action
 
     def get(self) -> list[T]:
         self.resources.clear()
-        self.clouding.get(self.endpoint)
+        self.clouding.get(self.resource)
         self.resources.extend(self._deserialize_resources(self.response_key))
         while self.clouding.next():  # pagination
             self.resources.extend(self._deserialize_resources(self.response_key))
@@ -58,7 +58,7 @@ class Endpoint[T: Resource]:
 
     def get_by_id(self, id: str) -> T | None:
         self.resources.clear()
-        self.clouding.get(self.endpoint / id)
+        self.clouding.get(self.resource / id)
         self.resources.extend(self._deserialize_resources())
         return self.resources[0] if self.resources else None
 
@@ -89,7 +89,7 @@ class Endpoint[T: Resource]:
             resources = self.get()
         elif not isinstance(resources, list):
             resources = [resources]
-        result = {str(self.endpoint): [resource.model_dump() for resource in resources]}
+        result = {str(self.resource): [resource.model_dump() for resource in resources]}
         return self._to_str(result)
 
     def delete_resource(self, args: argparse.Namespace):
@@ -126,7 +126,7 @@ class Endpoint[T: Resource]:
     def _to_str(self, response: dict) -> str:
         if self.be_verbose:
             response["verbose"] = {
-                "endpoint": str(self.endpoint),
+                "resource": str(self.resource),
                 "status_code": self.clouding.response.status_code,
             }
             response["verbose"].update(

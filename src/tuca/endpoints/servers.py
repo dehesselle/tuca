@@ -186,11 +186,11 @@ class Servers(Endpoint[Server]):
             exit(1)
 
     def start(self, id: str):
-        self.clouding.post(self.endpoint / id / "start")
+        self.clouding.post(self.resource / id / "start")
         print(self._to_str(self._deserialize_action().as_dict))
 
     def stop(self, id: str):
-        self.clouding.post(self.endpoint / id / "stop")
+        self.clouding.post(self.resource / id / "stop")
         print(self._to_str(self._deserialize_action().as_dict))
 
 

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 René de Hesselle <dehesselle@web.de>
+
+SPDX-License-Identifier: GPL-2.0-or-later
+-->
+
 # tool using Clouding.io API
 
 This is an unofficial CLI that interacts with Clouding.io's REST API. Its main purpose is to provide a simple interface to create and destroy servers from snapshots. It neither provides access to all API endpoints nor to all attributes and/or actions.

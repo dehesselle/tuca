@@ -10,9 +10,9 @@ from typing import Type, cast
 from pydantic import BaseModel, ValidationError
 from urlpath import URL
 
-from tuca.clouding import Action, Clouding
-
-from .resource import IdentifiableResource, NamedResource, Resource
+from tuca.clouding import Clouding
+from tuca.resources.action import Action
+from tuca.resources.resource import IdentifiableResource, NamedResource, Resource
 
 log = logging.getLogger("endpoint")
 

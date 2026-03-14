@@ -9,7 +9,8 @@ from http import HTTPStatus
 import requests
 from urlpath import URL
 
-from .action import Action
+from tuca.resources.action import Action
+
 from .auth import get_token
 from .response import Pagination, ResponseHeader
 

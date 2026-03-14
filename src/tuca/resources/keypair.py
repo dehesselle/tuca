@@ -2,5 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .auth import setup_auth_cli
-from .clouding import Clouding
+from .resource import NamedResource
+
+
+class Keypair(NamedResource):
+    fingerprint: str

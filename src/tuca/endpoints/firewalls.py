@@ -5,16 +5,13 @@
 import argparse
 from enum import StrEnum, auto
 
+from tuca.resources.firewall import Firewall
+
 from .endpoint import Endpoint
-from .resource import NamedResource
 
 
 class Command(StrEnum):
     LIST = auto()
-
-
-class Firewall(NamedResource):
-    pass
 
 
 class Firewalls(Endpoint[Firewall]):
@@ -51,4 +48,5 @@ def setup_firewalls_endpoint(subparser: argparse._SubParsersAction):
         required=False,
         help="case-insensitive matching with name and id",
     )
+    firewall_action_list.set_defaults(func=list_firewalls)
     firewall_action_list.set_defaults(func=list_firewalls)

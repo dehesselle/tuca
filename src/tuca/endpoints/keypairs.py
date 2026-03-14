@@ -5,18 +5,15 @@
 import argparse
 from enum import StrEnum, auto
 
+from tuca.resources.keypair import Keypair
+
 from .endpoint import Endpoint, RequestPayload
-from .resource import NamedResource
 
 
 class Command(StrEnum):
     CREATE = auto()
     DELETE = auto()
     LIST = auto()
-
-
-class Keypair(NamedResource):
-    fingerprint: str
 
 
 class Keypairs(Endpoint[Keypair]):
@@ -85,4 +82,5 @@ def setup_keypairs_endpoint(subparser: argparse._SubParsersAction):
         required=False,
         help="case-insensitive matching with name and id",
     )
+    keypair_action_list.set_defaults(func=list_keypairs)
     keypair_action_list.set_defaults(func=list_keypairs)

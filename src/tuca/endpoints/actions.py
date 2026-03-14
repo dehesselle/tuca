@@ -5,10 +5,9 @@
 import argparse
 from enum import StrEnum, auto
 
-from tuca.clouding import Action as NonResourceAction
+from tuca.resources.action import Action
 
 from .endpoint import Endpoint
-from .resource import IdentifiableResource
 
 
 class Command(StrEnum):
@@ -20,13 +19,6 @@ class Status(StrEnum):
     IN_PROGRESS = "inProgress"
     COMPLETED = auto()
     ERRORED = auto()
-
-
-class Action(
-    NonResourceAction, IdentifiableResource
-):  # We're turning the Action from clouding.action module into a resource
-    # to make it compatible with our Endpoint infrastructure.
-    pass
 
 
 class Actions(Endpoint[Action]):

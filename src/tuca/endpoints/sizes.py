@@ -5,26 +5,14 @@
 import argparse
 from enum import StrEnum, auto
 
+from tuca.resources.flavor import Flavor
+from tuca.resources.volumesize import VolumeSize
+
 from .endpoint import Endpoint
-from .resource import IdentifiableResource, Resource
 
 
 class Command(StrEnum):
     LIST = auto()
-
-
-class Flavor(IdentifiableResource):
-    vCores: float
-    ramGb: int
-    pricePerHour: float
-    pricePerMonthApprox: float
-
-
-class VolumeSize(Resource):
-    storageType: str
-    sizeGb: int
-    pricePerHour: float
-    pricePerMonthApprox: float
 
 
 class Flavors(Endpoint[Flavor]):
@@ -82,4 +70,5 @@ def setup_sizes_endpoint(subparser: argparse._SubParsersAction):
     flavors_action_list = flavors_actions.add_parser(
         Command.LIST, help="list available flavors"
     )
+    flavors_action_list.set_defaults(func=list_flavors)
     flavors_action_list.set_defaults(func=list_flavors)

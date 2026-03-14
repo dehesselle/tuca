@@ -11,16 +11,13 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from enum import StrEnum, auto
 
 from pydantic import BaseModel
-from pydantic.experimental.missing_sentinel import (
-    MISSING,  # https://docs.pydantic.dev/dev/concepts/experimental/#missing-sentinel
-)
 from slugify import slugify
 
-from .actions import Action
+from tuca.resources.server import Server
+
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
 from .images import Images
-from .resource import NamedResource
 from .sizes import Flavors, VolumeSizes
 from .snapshots import Snapshots
 
@@ -61,13 +58,6 @@ class CreateRequestPayload(RequestPayload):
     accessConfiguration: AccessConfiguration
     volume: Volume
     publicPortFirewallIds: list[str]
-
-
-class Server(NamedResource):
-    createdAt: str = ""
-    publicIp: str | None = ""
-    status: str
-    action: Action | MISSING = MISSING
 
 
 class Servers(Endpoint[Server]):
@@ -296,4 +286,5 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     id_or_name = server_action_stop.add_mutually_exclusive_group(required=False)
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
+    server_action_stop.set_defaults(func=stop_server)
     server_action_stop.set_defaults(func=stop_server)

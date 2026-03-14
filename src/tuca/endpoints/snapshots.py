@@ -5,19 +5,13 @@
 import argparse
 from enum import StrEnum, auto
 
+from tuca.resources.snapshot import Snapshot
+
 from .endpoint import Endpoint
-from .images import Image
-from .resource import NamedResource
 
 
 class Command(StrEnum):
     LIST = auto()
-
-
-class Snapshot(NamedResource):
-    createdAt: str
-    sizeGb: int
-    image: Image
 
 
 class Snapshots(Endpoint[Snapshot]):

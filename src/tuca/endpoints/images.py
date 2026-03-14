@@ -5,24 +5,13 @@
 import argparse
 from enum import StrEnum, auto
 
-from pydantic import BaseModel, Field
+from tuca.resources.image import Image
 
 from .endpoint import Endpoint
-from .resource import NamedResource
 
 
 class Command(StrEnum):
     LIST = auto()
-
-
-class AccessMethods(BaseModel):
-    sshKey: str
-    password: str
-
-
-class Image(NamedResource):
-    accessMethods: AccessMethods
-    minimumSizeGb: int = Field(default=0)  # default for reusability in Snapshot
 
 
 class Images(Endpoint[Image]):

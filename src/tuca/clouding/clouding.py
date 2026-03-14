@@ -16,7 +16,7 @@ from .response import Pagination, ResponseHeader
 log = logging.getLogger("clouding")
 
 
-ValidStatusCodes = [
+ValidStatusCodes = (
     HTTPStatus.OK,
     HTTPStatus.CREATED,
     HTTPStatus.ACCEPTED,
@@ -29,7 +29,7 @@ ValidStatusCodes = [
     HTTPStatus.TOO_MANY_REQUESTS,
     HTTPStatus.INTERNAL_SERVER_ERROR,
     HTTPStatus.SERVICE_UNAVAILABLE,
-]  # https://api.clouding.io/docs/#section/Introduction/Responses
+)  # https://api.clouding.io/docs/#section/Introduction/Responses
 
 
 class Clouding:
@@ -93,12 +93,12 @@ class Clouding:
 
     @property
     def is_status_ok(self) -> bool:
-        return self.response.status_code in [
+        return self.response.status_code in (
             HTTPStatus.OK,
             HTTPStatus.CREATED,
             HTTPStatus.ACCEPTED,
             HTTPStatus.NO_CONTENT,
-        ]
+        )
 
     @property
     def is_status_valid(self) -> bool:

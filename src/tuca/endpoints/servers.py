@@ -13,7 +13,7 @@ from enum import StrEnum, auto
 from pydantic import BaseModel
 from slugify import slugify
 
-from tuca.resources.server import Server
+from tuca.resources.server import Server, Status
 
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
@@ -30,13 +30,6 @@ class Command(StrEnum):
     DELETE = auto()
     START = auto()
     STOP = auto()
-
-
-class Status(StrEnum):
-    CREATING = "Creating"
-    ACTIVE = "Active"
-    PENDING = "Pending"
-    STOPPED = "Stopped"
 
 
 class AccessConfiguration(BaseModel):

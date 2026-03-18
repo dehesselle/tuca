@@ -6,13 +6,13 @@ SPDX-License-Identifier: GPL-2.0-or-later
 
 # tool using Clouding.io API
 
-This is an unofficial CLI that interacts with Clouding.io's REST API. Its main purpose is to provide a simple interface to create and destroy servers from snapshots. It neither provides access to all API endpoints nor to all attributes and/or actions.
+This is an unofficial CLI that interacts with Clouding.io's REST API. Its main purpose is to provide a simple interface to create and destroy servers from snapshots/images. It is not an all-encompassing tool as it neither provides access to all API endpoints nor all actions.
 
 The project status is best described as "alpha" as things are still very much in motion.
 
 ## Installation
 
-`tuca` is on [PyPi](https://pypi.org/project/tuca/), you can use the package manager of your choice to set yourself up. Here is an example using `uv`:
+`tuca` is on [PyPi](https://pypi.org/project/tuca/), use the package manager of your choice to set yourself up. Here is an example using `uv`:
 
 ```bash
 uv tool install tuca

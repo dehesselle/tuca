@@ -12,7 +12,12 @@ from urlpath import URL
 
 from tuca.clouding import Clouding
 from tuca.resources.action import Action
-from tuca.resources.resource import IdentifiableResource, NamedResource, Resource
+from tuca.resources.resource import (
+    SERIALIZE_ALWAYS_KEY,
+    IdentifiableResource,
+    NamedResource,
+    Resource,
+)
 
 log = logging.getLogger("endpoint")
 
@@ -89,7 +94,19 @@ class Endpoint[T: Resource]:
             resources = self.get()
         elif not isinstance(resources, list):
             resources = [resources]
-        result = {str(self.resource): [resource.model_dump() for resource in resources]}
+        result = {
+            str(self.resource): [
+                (
+                    resource.model_dump()
+                    if self.be_verbose
+                    else resource.model_dump(
+                        include=resource.get_marked_fields(SERIALIZE_ALWAYS_KEY)
+                    )
+                )
+                for resource in resources
+            ]
+        }
+
         return self._to_str(result)
 
     def delete_resource(self, args: argparse.Namespace):

@@ -4,12 +4,13 @@
 
 from enum import StrEnum
 
+from pydantic import Field
 from pydantic.experimental.missing_sentinel import (
     MISSING,  # https://docs.pydantic.dev/dev/concepts/experimental/#missing-sentinel
 )
 
 from .action import Action
-from .resource import NamedResource
+from .resource import SERIALIZE_ALWAYS, IdentifiableResource, NamedResource
 
 
 class Status(StrEnum):
@@ -41,8 +42,51 @@ class Status(StrEnum):
     UNKNOWN = "Unknown"
 
 
+class ServerImageInfo(NamedResource):
+    pass
+
+
+class PowerState(StrEnum):
+    NO_STATE = "NoState"
+    RUNNING = "Running"
+    PAUSED = "Paused"
+    SHUTDOWN = "Shutdown"
+    CRASHED = "Crashed"
+    SUSPENDED = "Suspended"
+
+
+class PublicPortDescriptor(IdentifiableResource):
+    ipAddress: str
+    macAddress: str
+
+
+class VpcDescriptor(NamedResource):
+    pass
+
+
+class VpcPortDescriptor(IdentifiableResource):
+    ipAddress: str
+    macAddress: str
+    vpc: VpcDescriptor
+
+
 class Server(NamedResource):
-    createdAt: str = ""
-    publicIp: str | None = ""
+    action: Action | MISSING = Field(
+        default=MISSING, json_schema_extra=SERIALIZE_ALWAYS
+    )
+    createdAt: str = Field(default="", json_schema_extra=SERIALIZE_ALWAYS)
+    dnsAddress: str | None = None
+    features: list[str] = []
+    flavor: str
+    hostname: str
+    image: ServerImageInfo
+    powerState: PowerState = Field(default=PowerState.NO_STATE)
+    publicPorts: list[PublicPortDescriptor] = Field(
+        default=[], json_schema_extra=SERIALIZE_ALWAYS
+    )
+    ramGb: int
+    sshKeyId: str | None = None
     status: Status
-    action: Action | MISSING = MISSING
+    vCores: float
+    volumeSizeGb: int
+    vpcPorts: list[VpcPortDescriptor] = []

@@ -4,7 +4,7 @@
 
 from pydantic import BaseModel, Field
 
-from .resource import NamedResource
+from .resource import SERIALIZE_ALWAYS, NamedResource
 
 
 class AccessMethods(BaseModel):
@@ -13,5 +13,8 @@ class AccessMethods(BaseModel):
 
 
 class Image(NamedResource):
-    accessMethods: AccessMethods
-    minimumSizeGb: int = Field(default=0)  # default for reusability in Snapshot
+    accessMethods: AccessMethods = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    billingUnit: str | None
+    minimumSizeGb: int = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    pricePerHour: float
+    pricePerMonthApprox: float

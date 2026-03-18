@@ -2,8 +2,12 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .resource import NamedResource
+from pydantic import Field
+
+from .resource import SERIALIZE_ALWAYS, NamedResource
 
 
 class Keypair(NamedResource):
-    fingerprint: str
+    fingerprint: str = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    hasPrivateKey: bool
+    publicKey: str

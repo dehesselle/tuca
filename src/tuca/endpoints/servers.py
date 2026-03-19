@@ -159,7 +159,7 @@ class Servers(Endpoint[Server]):
                                 break
                             time.sleep(seconds)
 
-                    future = executor.submit(wait, self, Status.ACTIVE, 30)
+                    future = executor.submit(wait, self, Status.ACTIVE, 15)
                     try:
                         future.result(timeout=300)
                     except TimeoutError:

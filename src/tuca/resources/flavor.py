@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .resource import IdentifiableResource
+from pydantic import Field
+
+from .resource import SERIALIZE_ALWAYS, IdentifiableResource
 
 
 class Flavor(IdentifiableResource):
     vCores: float
     ramGb: int
-    pricePerHour: float
+    pricePerHour: float = Field(json_schema_extra=SERIALIZE_ALWAYS)
     pricePerMonthApprox: float

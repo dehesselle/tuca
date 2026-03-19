@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .resource import Resource
+from pydantic import Field
+
+from .resource import SERIALIZE_ALWAYS, Resource
 
 
 class VolumeSize(Resource):
     storageType: str
-    sizeGb: int
+    sizeGb: int = Field(json_schema_extra=SERIALIZE_ALWAYS)
     pricePerHour: float
     pricePerMonthApprox: float

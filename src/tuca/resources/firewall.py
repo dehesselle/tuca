@@ -2,7 +2,9 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .resource import IdentifiableResource, NamedResource, Resource
+from pydantic import Field
+
+from .resource import SERIALIZE_ALWAYS, IdentifiableResource, NamedResource, Resource
 
 
 class FirewallRule(IdentifiableResource):
@@ -33,6 +35,6 @@ class FirewallAttachment(Resource):
 
 
 class Firewall(NamedResource):
-    description: str
+    description: str = Field(json_schema_extra=SERIALIZE_ALWAYS)
     rules: list[FirewallRule]
     attachments: list[FirewallAttachment]

@@ -8,11 +8,12 @@ from tuca.clouding import setup_auth_cli
 from tuca.endpoints import (
     setup_actions_endpoint,
     setup_firewalls_endpoint,
+    setup_flavors_endpoint,
     setup_images_endpoint,
     setup_keypairs_endpoint,
     setup_servers_endpoint,
-    setup_sizes_endpoint,
     setup_snapshots_endpoint,
+    setup_volumes_endpoint,
 )
 from tuca.endpoints.endpoint import Endpoint
 from tuca.log import setup_logging
@@ -35,11 +36,12 @@ def main() -> None:
     setup_actions_endpoint(endpoints)
     setup_auth_cli(endpoints)
     setup_firewalls_endpoint(endpoints)
+    setup_flavors_endpoint(endpoints)
     setup_images_endpoint(endpoints)
     setup_keypairs_endpoint(endpoints)
     setup_servers_endpoint(endpoints)
     setup_snapshots_endpoint(endpoints)
-    setup_sizes_endpoint(endpoints)
+    setup_volumes_endpoint(endpoints)
 
     args = parser.parse_args()
     Endpoint.be_verbose = args.verbose

@@ -17,9 +17,10 @@ from tuca.resources.server import Server, Status
 
 from .endpoint import Endpoint, RequestPayload
 from .firewalls import Firewalls
+from .flavors import Flavors
 from .images import Images
-from .sizes import Flavors, VolumeSizes
 from .snapshots import Snapshots
+from .volumes import Volumes
 
 log = logging.getLogger("servers")
 
@@ -106,7 +107,7 @@ class Servers(Endpoint[Server]):
             exit(1)
 
         if args.ssdgb:
-            if args.ssdgb not in VolumeSizes().all:
+            if args.ssdgb not in Volumes().all:
                 log.error(f"volume size not supported: {args.ssdgb}")
                 exit(1)
             volume.ssdGb = args.ssdgb

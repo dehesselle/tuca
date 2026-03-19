@@ -86,7 +86,7 @@ class Server(NamedResource):
     )
     ramGb: int
     sshKeyId: str | None = None
-    status: Status
+    status: Status = Field(json_schema_extra=SERIALIZE_ALWAYS)
     vCores: float
     volumeSizeGb: int
     vpcPorts: list[VpcPortDescriptor] = []

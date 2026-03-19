@@ -53,13 +53,11 @@ def delete_token(_) -> None:
 
 
 def setup_auth_cli(subparser: _SubParsersAction):
-    auth = subparser.add_parser("auth", help="manage authentication token")
+    auth = subparser.add_parser("auth", help="authentication")
     auth_actions = auth.add_subparsers()
-    auth_action_set = auth_actions.add_parser(
-        Command.CREATE, help="set authentication token"
-    )
+    auth_action_set = auth_actions.add_parser(Command.CREATE, help="set API token")
     auth_action_set.set_defaults(func=set_token)
     auth_action_delete = auth_actions.add_parser(
-        Command.DELETE, help="delete authentication token"
+        Command.DELETE, help="delete API token"
     )
     auth_action_delete.set_defaults(func=delete_token)

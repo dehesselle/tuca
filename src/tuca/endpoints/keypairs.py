@@ -54,7 +54,7 @@ def list_keypairs(args: argparse.Namespace):
 
 
 def setup_keypairs_endpoint(subparser: argparse._SubParsersAction):
-    snapshots = subparser.add_parser("keypairs", help="manage SSH keys")
+    snapshots = subparser.add_parser("keypairs", help="SSH keys")
     keypair_actions = snapshots.add_subparsers(help="available commands")
 
     keypair_action_create = keypair_actions.add_parser(

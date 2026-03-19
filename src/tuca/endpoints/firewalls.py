@@ -32,7 +32,7 @@ def list_firewalls(args: argparse.Namespace):
 
 
 def setup_firewalls_endpoint(subparser: argparse._SubParsersAction):
-    firewalls = subparser.add_parser("firewalls", help="manage firewalls")
+    firewalls = subparser.add_parser("firewalls", help="firewalls and rules")
     firewall_actions = firewalls.add_subparsers(help="available commands")
 
     firewall_action_list = firewall_actions.add_parser(

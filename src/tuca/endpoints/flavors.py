@@ -36,7 +36,7 @@ def list_flavors(args: argparse.Namespace):
 
 
 def setup_flavors_endpoint(subparser: argparse._SubParsersAction):
-    flavors = subparser.add_parser("flavors", help="cpu/memory combinations")
+    flavors = subparser.add_parser("flavors", help="sizing as cpu/memory combinations")
     flavors_actions = flavors.add_subparsers(help="available commands")
     flavors_action_list = flavors_actions.add_parser(
         Command.LIST, help="list available flavors"

@@ -32,7 +32,7 @@ def main() -> None:
         help="make output verbose",
     )
     parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
-    endpoints = parser.add_subparsers(dest="endpoint", help="manageable resources")
+    endpoints = parser.add_subparsers(dest="endpoint", help="accessible endpoints")
     setup_actions_endpoint(endpoints)
     setup_auth_cli(endpoints)
     setup_firewalls_endpoint(endpoints)

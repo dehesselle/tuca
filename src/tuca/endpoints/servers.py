@@ -219,7 +219,7 @@ def stop_server(args: argparse.Namespace):
 
 
 def setup_servers_endpoint(subparser: argparse._SubParsersAction):
-    servers = subparser.add_parser("servers", help="manage servers")
+    servers = subparser.add_parser("servers", help="server instances")
     server_actions = servers.add_subparsers(help="available commands")
 
     server_action_create = server_actions.add_parser(
@@ -250,7 +250,7 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     server_action_create.set_defaults(func=create_server)
 
     server_action_delete = server_actions.add_parser(
-        Command.DELETE, help="delete a server"
+        Command.DELETE, help="delete server"
     )
     id_or_name = server_action_delete.add_mutually_exclusive_group(required=True)
     id_or_name.add_argument("--id", type=str, default="")

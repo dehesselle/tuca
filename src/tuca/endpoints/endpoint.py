@@ -142,15 +142,10 @@ class Endpoint[T: Resource]:
 
     def _to_str(self, response: dict) -> str:
         if self.be_verbose:
-            response["verbose"] = {
-                "resource": str(self.resource),
+            response["header"] = {
                 "status_code": self.clouding.response.status_code,
             }
-            response["verbose"].update(
-                self.clouding.response_header.model_dump(
-                    include={"rate_limit_remaining"}
-                )
-            )
+            response["header"].update(self.clouding.response_header.model_dump())
         return json.dumps(
             response,
             indent=4,

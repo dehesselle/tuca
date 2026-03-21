@@ -51,7 +51,7 @@ The output is
 
 - always presented as list, even if the result count is 1 or 0
 - usually named after the endpoint
-- contains an opionated subset of the available attributes, but always `id` and `name`
+- contains an opionated subset of the available attributes, but always `id` and `name` where applicable (use `-v` to show everything)
 - limited to a maximum of 100 entries
 
 ### Setup authentication
@@ -162,7 +162,6 @@ _(output shortened)_
         {
             "id": "8x16",
             "pricePerHour": 0.05472,
-            "pricePerMonthApprox": 39.9456,
             "ramGb": 16,
             "vCores": 8.0
         },
@@ -192,17 +191,17 @@ tuca servers create --image jXEm7yK3MJ2VYkQ9 --name MyWinServer --flavorid 8x16 
         {
             "action": {
                 "completedAt": null,
-                "id": "BEVPodeblJYKJv7a",
-                "resourceId": "R0XZEKlWEAMdWbQj",
+                "id": "aaaaaaaaaaaaaaaa",
+                "resourceId": "rrrrrrrrrrrrrrrr",
                 "resourceType": "server",
                 "startedAt": "2026-02-28T14:38:52.312803Z",
                 "status": "inProgress",
                 "type": "create"
             },
             "createdAt": "",
-            "id": "R0XZEKlWEAMdWbQj",
+            "id": "rrrrrrrrrrrrrrrr",
             "name": "MyWinServer",
-            "publicIp": "",
+            "publicPorts": [],
             "status": "Pending"
         }
     ]
@@ -225,9 +224,15 @@ tuca servers list --name MyWinServer
     "servers": [
         {
             "createdAt": "2026-02-28T14:38:52",
-            "id": "R0XZEKlWEAMdWbQj",
+            "id": "rrrrrrrrrrrrrrrr",
             "name": "MyWinServer",
-            "publicIp": null,
+            "publicPorts": [
+                {
+                    "id": "pppppppppppppppp",
+                    "ipAddress": "000.000.000.000",
+                    "macAddress": "00:00:00:00:00:00"
+                }
+            ],
             "status": "Creating"
         }
     ]
@@ -246,9 +251,15 @@ The server will be ready eventually.
     "servers": [
         {
             "createdAt": "2026-02-04T23:42:16",
-            "id": "mJOZBKqGP702Xjax",
+            "id": "rrrrrrrrrrrrrrrr",
             "name": "MyWinServer",
-            "publicIp": "103.23.60.115",
+            "publicPorts": [
+                {
+                    "id": "pppppppppppppppp",
+                    "ipAddress": "000.000.000.000",
+                    "macAddress": "00:00:00:00:00:00"
+                }
+            ],
             "status": "Active"
         }
     ]

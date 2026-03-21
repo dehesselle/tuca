@@ -7,14 +7,14 @@ import argparse
 from tuca.clouding import setup_auth_cli
 from tuca.cost import setup_cost_cli
 from tuca.endpoints import (
-    setup_actions_endpoint,
-    setup_firewalls_endpoint,
-    setup_flavors_endpoint,
-    setup_images_endpoint,
-    setup_keypairs_endpoint,
-    setup_servers_endpoint,
-    setup_snapshots_endpoint,
-    setup_volumes_endpoint,
+    setup_actions_cli,
+    setup_firewalls_cli,
+    setup_flavors_cli,
+    setup_images_cli,
+    setup_keypairs_cli,
+    setup_servers_cli,
+    setup_snapshots_cli,
+    setup_volumes_cli,
 )
 from tuca.endpoints.endpoint import Endpoint
 from tuca.log import setup_logging
@@ -33,19 +33,19 @@ def main() -> None:
         help="make output verbose",
     )
     parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
-    endpoints = parser.add_subparsers(dest="endpoint", help="accessible endpoints")
-    setup_actions_endpoint(endpoints)
-    setup_auth_cli(endpoints)
-    setup_cost_cli(endpoints)
-    setup_firewalls_endpoint(endpoints)
-    setup_flavors_endpoint(endpoints)
-    setup_images_endpoint(endpoints)
-    setup_keypairs_endpoint(endpoints)
-    setup_servers_endpoint(endpoints)
-    setup_snapshots_endpoint(endpoints)
-    setup_volumes_endpoint(endpoints)
-
+    subparsers = parser.add_subparsers(dest="endpoint", help="accessible endpoints")
+    setup_actions_cli(subparsers)
+    setup_auth_cli(subparsers)  # not an endpoint
+    setup_cost_cli(subparsers)  # not an endpoint
+    setup_firewalls_cli(subparsers)
+    setup_flavors_cli(subparsers)
+    setup_images_cli(subparsers)
+    setup_keypairs_cli(subparsers)
+    setup_servers_cli(subparsers)
+    setup_snapshots_cli(subparsers)
+    setup_volumes_cli(subparsers)
     args = parser.parse_args()
+
     Endpoint.be_verbose = args.verbose
     try:
         args.func(args)

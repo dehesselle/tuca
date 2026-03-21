@@ -30,7 +30,7 @@ def list_images(args: argparse.Namespace):
     Images().list_resources(args)
 
 
-def setup_images_endpoint(subparser: argparse._SubParsersAction):
+def setup_images_cli(subparser: argparse._SubParsersAction):
     images = subparser.add_parser("images", help="server OS images")
     images_actions = images.add_subparsers(help="available commands")
     images_action_list = images_actions.add_parser(Command.LIST, help="list images")

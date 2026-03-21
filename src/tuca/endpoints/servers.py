@@ -218,7 +218,7 @@ def stop_server(args: argparse.Namespace):
         log.error("server not found")
 
 
-def setup_servers_endpoint(subparser: argparse._SubParsersAction):
+def setup_servers_cli(subparser: argparse._SubParsersAction):
     servers = subparser.add_parser("servers", help="server instances")
     server_actions = servers.add_subparsers(help="available commands")
 

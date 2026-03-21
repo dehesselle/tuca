@@ -10,5 +10,5 @@ from .resource import SERIALIZE_ALWAYS, IdentifiableResource
 class Flavor(IdentifiableResource):
     pricePerHour: float = Field(json_schema_extra=SERIALIZE_ALWAYS)
     pricePerMonthApprox: float
-    ramGb: int
-    vCores: float
+    ramGb: int = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    vCores: float = Field(json_schema_extra=SERIALIZE_ALWAYS)

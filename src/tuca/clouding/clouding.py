@@ -52,7 +52,7 @@ class Clouding:
         self.response_header = ResponseHeader()
         self.response_page_size = 100
         self.pagination = Pagination()
-        self.action: Action
+        self.action: Action | None = None
 
     def get(self, resource: URL):
         self.resource = resource

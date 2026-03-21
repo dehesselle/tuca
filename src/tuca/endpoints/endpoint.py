@@ -48,7 +48,7 @@ class Endpoint[T: Resource]:
         self.resources.extend(self._deserialize_resources())
         return self.resources
 
-    def delete(self, id: str) -> Action:
+    def delete(self, id: str) -> Action | None:
         self.resources.clear()
         self.clouding.delete(self.resource, id)
         return self.clouding.action
@@ -126,8 +126,9 @@ class Endpoint[T: Resource]:
             resource_id = args.id
 
         if resource_id:
-            action = self.delete(resource_id)
-            if action.id:  # not every delete request produces an action
+            if action := self.delete(
+                resource_id
+            ):  # not every delete request produces an action
                 print(self._to_str(action.as_dict))
         else:
             if args.name:

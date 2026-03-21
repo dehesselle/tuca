@@ -5,6 +5,7 @@
 import argparse
 
 from tuca.clouding import setup_auth_cli
+from tuca.cost import setup_cost_cli
 from tuca.endpoints import (
     setup_actions_endpoint,
     setup_firewalls_endpoint,
@@ -35,6 +36,7 @@ def main() -> None:
     endpoints = parser.add_subparsers(dest="endpoint", help="accessible endpoints")
     setup_actions_endpoint(endpoints)
     setup_auth_cli(endpoints)
+    setup_cost_cli(endpoints)
     setup_firewalls_endpoint(endpoints)
     setup_flavors_endpoint(endpoints)
     setup_images_endpoint(endpoints)

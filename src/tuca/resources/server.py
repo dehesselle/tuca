@@ -47,11 +47,11 @@ class ServerImageInfo(NamedResource):
 
 
 class PowerState(StrEnum):
-    NO_STATE = "NoState"
-    RUNNING = "Running"
-    PAUSED = "Paused"
-    SHUTDOWN = "Shutdown"
     CRASHED = "Crashed"
+    NO_STATE = "NoState"
+    PAUSED = "Paused"
+    RUNNING = "Running"
+    SHUTDOWN = "Shutdown"
     SUSPENDED = "Suspended"
 
 

@@ -26,32 +26,32 @@ log = logging.getLogger("servers")
 
 
 class Command(StrEnum):
-    LIST = auto()
     CREATE = auto()
     DELETE = auto()
+    LIST = auto()
     START = auto()
     STOP = auto()
 
 
 class AccessConfiguration(BaseModel):
-    sshKeyId: str | None
     password: str | None
     savePassword: bool
+    sshKeyId: str | None
 
 
 class Volume(BaseModel):
-    source: str
     id: str
+    source: str
     ssdGb: int
 
 
 class CreateRequestPayload(RequestPayload):
-    name: str
-    hostname: str
-    flavorId: str
     accessConfiguration: AccessConfiguration
-    volume: Volume
+    flavorId: str
+    hostname: str
+    name: str
     publicPortFirewallIds: list[str]
+    volume: Volume
 
 
 class Servers(Endpoint[Server]):

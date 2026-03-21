@@ -15,10 +15,10 @@ class Command(StrEnum):
 
 
 class Status(StrEnum):
-    PENDING = auto()
-    IN_PROGRESS = "inProgress"
     COMPLETED = auto()
     ERRORED = auto()
+    IN_PROGRESS = "inProgress"
+    PENDING = auto()
 
 
 class Actions(Endpoint[Action]):

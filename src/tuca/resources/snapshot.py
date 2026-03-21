@@ -23,8 +23,8 @@ class Password(StrEnum):
 
 
 class RestoreServerAccessMethods(Resource):
-    sshKey: SshKey
     password: Password
+    sshKey: SshKey
 
 
 class SnapshotImageInfo(NamedResource):

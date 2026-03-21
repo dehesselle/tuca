@@ -8,8 +8,8 @@ from .resource import SERIALIZE_ALWAYS, NamedResource
 
 
 class AccessMethods(BaseModel):
-    sshKey: str
     password: str
+    sshKey: str
 
 
 class Image(NamedResource):

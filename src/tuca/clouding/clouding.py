@@ -18,18 +18,18 @@ log = logging.getLogger("clouding")
 
 
 ValidStatusCodes = (
-    HTTPStatus.OK,
-    HTTPStatus.CREATED,
     HTTPStatus.ACCEPTED,
-    HTTPStatus.NO_CONTENT,
     HTTPStatus.BAD_REQUEST,
-    HTTPStatus.UNAUTHORIZED,
+    HTTPStatus.CREATED,
     HTTPStatus.FORBIDDEN,
-    HTTPStatus.NOT_FOUND,
-    HTTPStatus.METHOD_NOT_ALLOWED,
-    HTTPStatus.TOO_MANY_REQUESTS,
     HTTPStatus.INTERNAL_SERVER_ERROR,
+    HTTPStatus.METHOD_NOT_ALLOWED,
+    HTTPStatus.NO_CONTENT,
+    HTTPStatus.NOT_FOUND,
+    HTTPStatus.OK,
     HTTPStatus.SERVICE_UNAVAILABLE,
+    HTTPStatus.TOO_MANY_REQUESTS,
+    HTTPStatus.UNAUTHORIZED,
 )  # https://api.clouding.io/docs/#section/Introduction/Responses
 
 
@@ -94,10 +94,10 @@ class Clouding:
     @property
     def is_status_ok(self) -> bool:
         return self.response.status_code in (
-            HTTPStatus.OK,
-            HTTPStatus.CREATED,
             HTTPStatus.ACCEPTED,
+            HTTPStatus.CREATED,
             HTTPStatus.NO_CONTENT,
+            HTTPStatus.OK,
         )
 
     @property

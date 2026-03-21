@@ -8,7 +8,7 @@ from .resource import SERIALIZE_ALWAYS, IdentifiableResource
 
 
 class Flavor(IdentifiableResource):
-    vCores: float
-    ramGb: int
     pricePerHour: float = Field(json_schema_extra=SERIALIZE_ALWAYS)
     pricePerMonthApprox: float
+    ramGb: int
+    vCores: float

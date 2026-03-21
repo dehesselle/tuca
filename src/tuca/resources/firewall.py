@@ -9,11 +9,11 @@ from .resource import SERIALIZE_ALWAYS, IdentifiableResource, NamedResource, Res
 
 class FirewallRule(IdentifiableResource):
     description: str
-    protocol: str
+    enabled: bool
     portRangeMin: int | None
     portRangeMax: int | None
+    protocol: str
     sourceIp: str
-    enabled: bool
 
 
 class AttachedPublicPort(IdentifiableResource):
@@ -28,13 +28,13 @@ class AttachedVpcPort(IdentifiableResource):
 
 
 class FirewallAttachment(Resource):
+    publicPorts: list[AttachedPublicPort]
     serverId: str
     serverName: str
-    publicPorts: list[AttachedPublicPort]
     vpcPorts: list[AttachedVpcPort]
 
 
 class Firewall(NamedResource):
+    attachments: list[FirewallAttachment]
     description: str = Field(json_schema_extra=SERIALIZE_ALWAYS)
     rules: list[FirewallRule]
-    attachments: list[FirewallAttachment]

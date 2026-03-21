@@ -10,10 +10,10 @@ from .resource import IdentifiableResource
 class Status(StrEnum):
     """The current status of the action."""
 
-    PENDING = auto()
-    IN_PROGRESS = "inProgress"
     COMPLETED = auto()
     ERRORED = auto()
+    IN_PROGRESS = "inProgress"
+    PENDING = auto()
 
 
 class Action(IdentifiableResource):
@@ -25,12 +25,12 @@ class Action(IdentifiableResource):
        https://api.clouding.io/docs/#tag/Actions
     """
 
-    status: Status
-    type: str
-    startedAt: str
     completedAt: str | None
     resourceId: str
     resourceType: str
+    startedAt: str
+    status: Status
+    type: str
 
     @property
     def as_dict(self) -> dict:

@@ -8,7 +8,7 @@ from .resource import SERIALIZE_ALWAYS, Resource
 
 
 class VolumeSize(Resource):
-    storageType: str
-    sizeGb: int = Field(json_schema_extra=SERIALIZE_ALWAYS)
     pricePerHour: float
     pricePerMonthApprox: float
+    sizeGb: int = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    storageType: str

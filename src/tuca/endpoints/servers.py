@@ -281,4 +281,3 @@ def setup_servers_endpoint(subparser: argparse._SubParsersAction):
     id_or_name.add_argument("--id", type=str, default="")
     id_or_name.add_argument("--name", type=str, default="")
     server_action_stop.set_defaults(func=stop_server)
-    server_action_stop.set_defaults(func=stop_server)

@@ -63,13 +63,22 @@ class Endpoint[T: Resource]:
 
     def get_by_id(self, id: str) -> T | None:
         self.resources.clear()
+        # The API supports requesting a single resource by ID,
+        # so we're using that.
         self.clouding.get(self.resource / id)
         self.resources.extend(self._deserialize_resources())
-        return self.resources[0] if self.resources else None
+        try:
+            return self.resources[0]
+        except IndexError:
+            log.debug(f"resource id not found: {id}")
+            return None
 
     def get_by_name(self, name: str) -> T | None:
+        # The API does not support requesting a single resource
+        # by name, so we have to request them all and then
+        # select the one we want.
         try:
-            return self._by_name[name]
+            return self.by_name[name]
         except KeyError:
             return None
 
@@ -89,10 +98,8 @@ class Endpoint[T: Resource]:
             )
         ]
 
-    def to_str(self, resources: list[T] | T | None = None) -> str:
-        if resources is None:
-            resources = self.get()
-        elif not isinstance(resources, list):
+    def to_str(self, resources: list[T] | T) -> str:
+        if not isinstance(resources, list):
             resources = [resources]
         result = {
             str(self.resource): [
@@ -132,13 +139,20 @@ class Endpoint[T: Resource]:
 
     def list_resources(self, args: argparse.Namespace):
         if hasattr(args, "id") and args.id:
-            print(self.to_str(self.get_by_id(args.id)))
+            if resource := self.get_by_id(args.id):
+                print(self.to_str(resource))
+            else:
+                print(self.to_str([]))
         elif hasattr(args, "name") and args.name:
-            print(self.to_str(self.get_by_name(args.name)))
+            if resource := self.get_by_name(args.name):
+                print(self.to_str(resource))
+            else:
+                print(self.to_str([]))
         elif hasattr(args, "filter") and args.filter:
             print(self.to_str(self.find(args.filter)))
         else:
-            print(self.to_str())
+            self.get()
+            print(self.to_str(self.resources))
 
     def _to_str(self, response: dict) -> str:
         if self.be_verbose:
@@ -174,8 +188,8 @@ class Endpoint[T: Resource]:
                 log.error(f"unable to deserialize contents of: {key}")
                 exit(1)
         elif self.clouding.is_status_not_found:
-            log.error("resource(s) not found")
-            exit(1)
+            # not a breaking error here, needs to be handled upstream
+            log.debug("resource(s) not found")
         else:
             log.error(f"HTTP status: {self.clouding.response.status_code}")
             exit(1)
@@ -205,7 +219,7 @@ class Endpoint[T: Resource]:
         return self.action
 
     @property
-    def _by_id(
+    def by_id(
         self,
     ) -> dict[str, T]:
         if not self.resources:
@@ -216,7 +230,7 @@ class Endpoint[T: Resource]:
         }
 
     @property
-    def _by_name(self) -> dict[str, T]:
+    def by_name(self) -> dict[str, T]:
         if not self.resources:
             self.get()
         return {

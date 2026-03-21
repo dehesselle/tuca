@@ -32,7 +32,7 @@ class Keypairs(Endpoint[Keypair]):
             name=args.name, publicKey=args.publickey, privateKey=args.privatekey
         )
         self.create(payload)
-        print(self.to_str())
+        print(self.to_str(self.resources))
 
 
 class CreateRequestPayload(RequestPayload):

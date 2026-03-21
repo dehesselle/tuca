@@ -74,7 +74,9 @@ def setup_keypairs_cli(subparser: argparse._SubParsersAction):
     keypair_action_delete.set_defaults(func=delete_keypair)
 
     keypair_action_list = keypair_actions.add_parser(Command.LIST, help="list SSH keys")
-    keypair_action_list.add_argument("-i", "--id", default="", required=False)
+    id_or_name = keypair_action_list.add_mutually_exclusive_group(required=False)
+    id_or_name.add_argument("--id", type=str, default="")
+    id_or_name.add_argument("--name", type=str, default="")
     keypair_action_list.add_argument(
         "--filter",
         type=str,
@@ -82,5 +84,4 @@ def setup_keypairs_cli(subparser: argparse._SubParsersAction):
         required=False,
         help="case-insensitive matching with name and id",
     )
-    keypair_action_list.set_defaults(func=list_keypairs)
     keypair_action_list.set_defaults(func=list_keypairs)

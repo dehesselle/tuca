@@ -20,6 +20,10 @@ class Expense(StrEnum):
 
 
 def print_total_cost_per_hour(_) -> None:
+    """collect incurring cost of all resources
+
+    This accounts only for images, servers and snapshots.
+    """
     servers = Servers()
     flavors = Flavors()
     images = Images()

@@ -7,6 +7,10 @@ import os
 
 
 def setup_logging() -> None:
+    """setup logging to stderr
+
+    By default, only errors are logged.
+    """
     level = os.environ.get("TUCA_LOGLEVEL", "ERROR").upper()
 
     stream_handler = logging.StreamHandler()

@@ -183,7 +183,10 @@ def create_server(args: argparse.Namespace):
 
 
 def delete_server(args: argparse.Namespace):
-    Servers().delete_resource(args)
+    if args.name:
+        Servers().delete_by_name(args.name)
+    else:
+        Servers().delete(args.id)
 
 
 def list_servers(args: argparse.Namespace):

@@ -53,6 +53,18 @@ class Endpoint[T: Resource]:
         self.clouding.delete(self.resource, id)
         return self.clouding.action
 
+    def delete_by_name(self, name: str):
+        if resource := self.get_one_by_name(name):
+            resource_id = cast(NamedResource, resource).id
+
+            if action := self.delete(
+                resource_id
+            ):  # not every delete request produces an action
+                print(self._to_str(action.as_dict))
+        else:
+            log.error(f"resource name not found: {name}")
+            exit(1)
+
     # naming convention: How to properly name "get one resource" vs.
     # "get all resources" methods? I've decided to follow Textual's example
     # with its query() and query_one() methods.
@@ -117,28 +129,6 @@ class Endpoint[T: Resource]:
         }
 
         return self._to_str(result)
-
-    def delete_resource(self, args: argparse.Namespace):
-        if args.name:
-            if resource := self.get_one_by_name(args.name):
-                resource_id = cast(NamedResource, resource).id
-            else:
-                resource_id = ""
-        else:
-            resource_id = args.id
-
-        if resource_id:
-            if action := self.delete(
-                resource_id
-            ):  # not every delete request produces an action
-                print(self._to_str(action.as_dict))
-        else:
-            if args.name:
-                log.error(f"resource name not found: {args.name}")
-                exit(1)
-            else:
-                log.error(f"resource id not found: {resource_id}")
-                exit(1)
 
     def list_resources(self, args: argparse.Namespace):
         if hasattr(args, "id") and args.id:

@@ -46,7 +46,10 @@ def create_keypair(args: argparse.Namespace):
 
 
 def delete_keypair(args: argparse.Namespace):
-    Keypairs().delete_resource(args)
+    if args.name:
+        Keypairs().delete_by_name(args.name)
+    else:
+        Keypairs().delete(args.id)
 
 
 def list_keypairs(args: argparse.Namespace):

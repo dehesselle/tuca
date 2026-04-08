@@ -53,6 +53,10 @@ class Endpoint[T: Resource]:
         self.clouding.delete(self.resource, id)
         return self.clouding.action
 
+    # naming convention: How to properly name "get one resource" vs.
+    # "get all resources" methods? I've decided to follow Textual's example
+    # with its query() and query_one() methods.
+
     def get(self) -> list[T]:
         self.resources.clear()
         self.clouding.get(self.resource)
@@ -61,10 +65,8 @@ class Endpoint[T: Resource]:
             self.resources.extend(self._deserialize_resources(self.response_key))
         return self.resources
 
-    def get_by_id(self, id: str) -> T | None:
+    def get_one(self, id: str) -> T | None:
         self.resources.clear()
-        # The API supports requesting a single resource by ID,
-        # so we're using that.
         self.clouding.get(self.resource / id)
         self.resources.extend(self._deserialize_resources())
         try:
@@ -73,7 +75,7 @@ class Endpoint[T: Resource]:
             log.debug(f"resource id not found: {id}")
             return None
 
-    def get_by_name(self, name: str) -> T | None:
+    def get_one_by_name(self, name: str) -> T | None:
         # The API does not support requesting a single resource
         # by name, so we have to request them all and then
         # select the one we want.
@@ -118,7 +120,7 @@ class Endpoint[T: Resource]:
 
     def delete_resource(self, args: argparse.Namespace):
         if args.name:
-            if resource := self.get_by_name(args.name):
+            if resource := self.get_one_by_name(args.name):
                 resource_id = cast(NamedResource, resource).id
             else:
                 resource_id = ""
@@ -140,12 +142,12 @@ class Endpoint[T: Resource]:
 
     def list_resources(self, args: argparse.Namespace):
         if hasattr(args, "id") and args.id:
-            if resource := self.get_by_id(args.id):
+            if resource := self.get_one(args.id):
                 print(self.to_str(resource))
             else:
                 print(self.to_str([]))
         elif hasattr(args, "name") and args.name:
-            if resource := self.get_by_name(args.name):
+            if resource := self.get_one_by_name(args.name):
                 print(self.to_str(resource))
             else:
                 print(self.to_str([]))

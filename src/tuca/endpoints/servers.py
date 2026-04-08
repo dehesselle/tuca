@@ -154,7 +154,7 @@ class Servers(Endpoint[Server]):
                 with ThreadPoolExecutor() as executor:
 
                     def wait(servers: Servers, status: Status, seconds: int) -> None:
-                        while server := servers.get_by_id(servers.resources[0].id):
+                        while server := servers.get_one(servers.resources[0].id):
                             if server.status == status:
                                 break
                             time.sleep(seconds)
@@ -194,9 +194,9 @@ def start_server(args: argparse.Namespace):
     servers = Servers()
     server = None
     if hasattr(args, "id") and args.id:
-        server = servers.get_by_id(args.id)
+        server = servers.get_one(args.id)
     elif hasattr(args, "name") and args.name:
-        server = servers.get_by_name(args.name)
+        server = servers.get_one_by_name(args.name)
 
     if server:
         servers.start(server.id)
@@ -208,9 +208,9 @@ def stop_server(args: argparse.Namespace):
     servers = Servers()
     server = None
     if hasattr(args, "id") and args.id:
-        server = servers.get_by_id(args.id)
+        server = servers.get_one(args.id)
     elif hasattr(args, "name") and args.name:
-        server = servers.get_by_name(args.name)
+        server = servers.get_one_by_name(args.name)
 
     if server:
         servers.stop(server.id)

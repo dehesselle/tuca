@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import argparse
-import logging
 import platform
 import signal
 import time
@@ -13,16 +12,15 @@ from enum import StrEnum, auto
 from pydantic import BaseModel
 from slugify import slugify
 
+from tuca.resources.action import Action
 from tuca.resources.server import Server, Status
 
-from .endpoint import Endpoint, RequestPayload
+from .endpoint import Endpoint, EndpointError, ResourceNotFoundError
 from .firewalls import Firewalls
 from .flavors import Flavors
 from .images import Images
 from .snapshots import Snapshots
 from .volumes import Volumes
-
-log = logging.getLogger("servers")
 
 
 class Command(StrEnum):
@@ -45,13 +43,17 @@ class Volume(BaseModel):
     ssdGb: int
 
 
-class CreateRequestPayload(RequestPayload):
+class CreateServerRequest(BaseModel):
     accessConfiguration: AccessConfiguration
     flavorId: str
     hostname: str
     name: str
     publicPortFirewallIds: list[str]
     volume: Volume
+
+
+class CreateServerError(EndpointError):
+    pass
 
 
 class Servers(Endpoint[Server]):
@@ -65,92 +67,99 @@ class Servers(Endpoint[Server]):
     def __init__(self):
         super().__init__(Server, "servers")
 
-    def create_resource(self, args):
-        if args.flavorid not in Flavors().all:
-            log.error(f"flavor not supported: {args.flavorid}")
-            exit(1)
+    def create(
+        self,
+        name: str,
+        hostname: str,
+        flavor_id: str,
+        snapshot: str,
+        image: str,
+        volume_ssdgb: int,
+        password: str,
+        sshkey_id: str,
+        firewall: str,
+        wait_until_active: bool = False,
+    ):
+        if flavor_id not in Flavors().all:
+            raise CreateServerError(f"flavor not supported: {flavor_id}")
 
-        if args.snapshot:
-            if snapshots := [
-                snapshot
-                for snapshot in Snapshots().get()
-                if args.snapshot == snapshot.id or args.snapshot == snapshot.name
+        if firewall:
+            if matched_firewalls := [
+                _ for _ in Firewalls().get() if firewall == _.id or firewall == _.name
             ]:
-                if len(snapshots) > 1:
-                    log.error(f"multiple snapshots matched: {args.snapshot}")
-                    exit(1)
+                if len(matched_firewalls) > 1:
+                    raise CreateServerError(f"multiple firewalls matched: {firewall}")
+
+                firewall_id = matched_firewalls[0].id
+            else:
+                raise CreateServerError(f"firewall not found: {firewall}")
+        else:
+            raise CreateServerError("firewall not specified")
+
+        if volume_ssdgb and volume_ssdgb not in Volumes().all:
+            raise CreateServerError(f"volume size not supported: {volume_ssdgb}")
+
+        if snapshot:
+            if matched_snapshots := [
+                _ for _ in Snapshots().get() if snapshot == _.id or snapshot == _.name
+            ]:
+                if len(matched_snapshots) > 1:
+                    raise CreateServerError(f"multiple snapshots matched: {snapshot}")
 
                 volume = Volume(
-                    source="snapshot", id=snapshots[0].id, ssdGb=snapshots[0].sizeGb
+                    source="snapshot",
+                    id=matched_snapshots[0].id,
+                    ssdGb=matched_snapshots[0].sizeGb,
                 )
             else:
-                log.error(f"snapshot not found: {args.snapshot}")
-                exit(1)
-        elif args.image:
-            if images := [
-                image
-                for image in Images().get()
-                if args.image == image.id or args.image == image.name
+                raise CreateServerError(f"snapshot not found: {snapshot}")
+        elif image:
+            if matched_images := [
+                _ for _ in Images().get() if image == _.id or image == _.name
             ]:
-                if len(images) > 1:
-                    log.error(f"multiple images matched: {args.image}")
-                    exit(1)
+                if len(matched_images) > 1:
+                    raise CreateServerError(f"multiple images matched: {image}")
 
                 volume = Volume(
-                    source="image", id=images[0].id, ssdGb=images[0].minimumSizeGb
+                    source="image",
+                    id=matched_images[0].id,
+                    ssdGb=matched_images[0].minimumSizeGb,
                 )
             else:
-                log.error(f"image not found: {args.image}")
-                exit(1)
+                raise CreateServerError(f"image not found: {image}")
         else:
-            log.error("missing mandatory option: snapshot|image")
-            exit(1)
+            raise CreateServerError("missing mandatory option: {image,snapshot}")
 
-        if args.ssdgb:
-            if args.ssdgb not in Volumes().all:
-                log.error(f"volume size not supported: {args.ssdgb}")
-                exit(1)
-            volume.ssdGb = args.ssdgb
+        if volume_ssdgb and volume_ssdgb > volume.ssdGb:
+            volume.ssdGb = volume_ssdgb
 
-        if args.password:
+        if password:
             access_configuration = AccessConfiguration(
-                sshKeyId=None, password=args.password, savePassword=True
+                sshKeyId=None, password=password, savePassword=True
             )
-        elif args.sshkey:
+        elif sshkey_id:
             access_configuration = AccessConfiguration(
-                sshKeyId=args.sshkey, password=None, savePassword=False
+                sshKeyId=sshkey_id, password=None, savePassword=False
             )
         else:
-            log.error("missing mandatory option: password|sshkey")
-            exit(1)
+            raise CreateServerError("missing mandatory option: {password,sshkey}")
 
-        if firewalls := [
-            firewall
-            for firewall in Firewalls().get()
-            if args.firewall == firewall.id or args.firewall == firewall.name
-        ]:
-            if len(firewalls) > 1:
-                log.error(f"multiple firewalls matched: {args.firewall}")
-                exit(1)
-
-            firewall_id = firewalls[0].id
-        else:
-            log.error(f"firewall not found: {args.firewall}")
-            exit(1)
-
-        payload = CreateRequestPayload(
-            name=args.name,
-            hostname=slugify(args.hostname if args.hostname else args.name),
-            flavorId=args.flavorid,
-            accessConfiguration=access_configuration,
-            volume=volume,
-            publicPortFirewallIds=[firewall_id],
+        self._create(
+            CreateServerRequest(
+                accessConfiguration=access_configuration,
+                flavorId=flavor_id,
+                hostname=slugify(hostname if hostname else name),
+                name=name,
+                publicPortFirewallIds=[firewall_id],
+                volume=volume,
+            )
         )
-        self.create(payload)
+
         if self.resources:
-            if args.wait:
+            if wait_until_active:
                 if platform.system() == "Windows":
                     signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
+
                 with ThreadPoolExecutor() as executor:
 
                     def wait(servers: Servers, status: Status, seconds: int) -> None:
@@ -164,22 +173,33 @@ class Servers(Endpoint[Server]):
                         future.result(timeout=300)
                     except TimeoutError:
                         future.cancel()
-            print(self.to_str(self.resources))
+
+            print(self.to_str())
         else:
-            log.error("failed to create server")
-            exit(1)
+            raise CreateServerError("failed to create server")
 
-    def start(self, id: str):
+    def start(self, id: str) -> Action:
         self.clouding.post(self.resource / id / "start")
-        print(self._to_str(self._deserialize_action().as_dict))
+        return self._deserialize_action()
 
-    def stop(self, id: str):
+    def stop(self, id: str) -> Action:
         self.clouding.post(self.resource / id / "stop")
-        print(self._to_str(self._deserialize_action().as_dict))
+        return self._deserialize_action()
 
 
 def create_server(args: argparse.Namespace):
-    Servers().create_resource(args)
+    Servers().create(
+        name=args.name,
+        hostname=args.hostname,
+        flavor_id=args.flavorid,
+        snapshot=args.snapshot,
+        image=args.image,
+        volume_ssdgb=args.ssdgb,
+        password=args.password,
+        sshkey_id=args.sshkey,
+        firewall=args.firewall,
+        wait_until_active=args.wait,
+    )
 
 
 def delete_server(args: argparse.Namespace):
@@ -204,7 +224,7 @@ def start_server(args: argparse.Namespace):
     if server:
         servers.start(server.id)
     else:
-        log.error("server not found")
+        raise ResourceNotFoundError("server not found")
 
 
 def stop_server(args: argparse.Namespace):
@@ -218,7 +238,7 @@ def stop_server(args: argparse.Namespace):
     if server:
         servers.stop(server.id)
     else:
-        log.error("server not found")
+        raise ResourceNotFoundError("server not found")
 
 
 def setup_servers_cli(subparser: argparse._SubParsersAction):

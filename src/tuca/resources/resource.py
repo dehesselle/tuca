@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import json
-
 from pydantic import BaseModel, Field
 from pydantic.config import JsonDict
 
@@ -14,12 +12,11 @@ SERIALIZE_ALWAYS: JsonDict = {SERIALIZE_ALWAYS_KEY: True}
 class Resource(BaseModel):
     """generalized base class for all resources"""
 
-    @property
-    def as_str(self):
-        return json.dumps(
-            self.model_dump(),
-            indent=4,
-            sort_keys=True,
+    def to_dict(self, be_verbose: bool = False) -> dict:
+        return (
+            self.model_dump()
+            if be_verbose
+            else self.model_dump(include=self.get_marked_fields(SERIALIZE_ALWAYS_KEY))
         )
 
     @classmethod

@@ -5,9 +5,11 @@
 import argparse
 from enum import StrEnum, auto
 
+from pydantic import BaseModel
+
 from tuca.resources.keypair import Keypair
 
-from .endpoint import Endpoint, RequestPayload
+from .endpoint import Endpoint
 
 
 class Command(StrEnum):
@@ -28,14 +30,14 @@ class Keypairs(Endpoint[Keypair]):
         self.response_key = "values"
 
     def create_resource(self, args):
-        payload = CreateRequestPayload(
+        payload = CreateKeypairRequest(
             name=args.name, publicKey=args.publickey, privateKey=args.privatekey
         )
-        self.create(payload)
-        print(self.to_str(self.resources))
+        self._create(payload)
+        print(self.to_str())
 
 
-class CreateRequestPayload(RequestPayload):
+class CreateKeypairRequest(BaseModel):
     name: str
     publicKey: str
     privateKey: str

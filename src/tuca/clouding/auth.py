@@ -17,6 +17,10 @@ USERNAME = "tuca"
 log = logging.getLogger("auth")
 
 
+class AuthError(Exception):
+    pass
+
+
 class Command(StrEnum):
     CREATE = auto()
     DELETE = auto()
@@ -27,8 +31,7 @@ def set_token(_) -> None:
     try:
         keyring.set_password(SERVICENAME, USERNAME, token)
     except NoKeyringError:
-        log.error("no keyring available")
-        exit(1)
+        raise AuthError("no keyring available")
 
 
 def get_token(_) -> str:
@@ -41,11 +44,11 @@ def get_token(_) -> str:
                 log.debug("auth via keyring")
                 return api_token
             else:
-                log.error("no authentication available")
-                exit(1)
+                log.debug("no environment var and empty keyring")
+                raise AuthError("no authentication provided")
         except NoKeyringError:
-            log.error("no authentication available")
-            exit(1)
+            log.debug("no environment var and keyring inaccessible")
+            raise AuthError("no authentication provided")
 
 
 def delete_token(_) -> None:

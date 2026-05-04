@@ -4,7 +4,9 @@
 
 from enum import StrEnum, auto
 
-from .resource import IdentifiableResource
+from pydantic import Field
+
+from .resource import SERIALIZE_ALWAYS, IdentifiableResource
 
 
 class Status(StrEnum):
@@ -25,13 +27,9 @@ class Action(IdentifiableResource):
        https://api.clouding.io/docs/#tag/Actions
     """
 
-    completedAt: str | None
-    resourceId: str
-    resourceType: str
-    startedAt: str
-    status: Status
-    type: str
-
-    @property
-    def as_dict(self) -> dict:
-        return {"actions": [self.model_dump()]}
+    completedAt: str | None = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    resourceId: str = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    resourceType: str = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    startedAt: str = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    status: Status = Field(json_schema_extra=SERIALIZE_ALWAYS)
+    type: str = Field(json_schema_extra=SERIALIZE_ALWAYS)

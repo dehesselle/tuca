@@ -13,7 +13,6 @@ from urlpath import URL
 from tuca.clouding import Clouding
 from tuca.resources.action import Action
 from tuca.resources.resource import (
-    SERIALIZE_ALWAYS_KEY,
     IdentifiableResource,
     NamedResource,
     Resource,
@@ -22,7 +21,24 @@ from tuca.resources.resource import (
 log = logging.getLogger("endpoint")
 
 
-class RequestPayload(BaseModel):
+class EndpointError(Exception):
+    pass
+
+
+class ResourceNotFoundError(EndpointError):
+    pass
+
+
+class DeserializationError(EndpointError):
+    def __init__(self, message, response):
+        super().__init__(message)
+        self.response = response
+
+    def __str__(self):
+        return f"{self.message}\nresponse:\n{self.response}"
+
+
+class HttpError(EndpointError):
     pass
 
 
@@ -38,7 +54,7 @@ class Endpoint[T: Resource]:
         self.resource = URL(resource)
         self.response_key = resource
 
-    def create(self, payload: RequestPayload) -> list[T]:
+    def _create(self, payload: BaseModel) -> list[T]:
         self.resources.clear()
         self.clouding.post(
             self.resource,
@@ -60,10 +76,9 @@ class Endpoint[T: Resource]:
             if action := self.delete(
                 resource_id
             ):  # not every delete request produces an action
-                print(self._to_str(action.as_dict))
+                print(self._to_str({"actions": [action.to_dict(self.be_verbose)]}))
         else:
-            log.error(f"resource name not found: {name}")
-            exit(1)
+            raise ResourceNotFoundError(f"resource name not found: {name}")
 
     # naming convention: How to properly name "get one resource" vs.
     # "get all resources" methods? I've decided to follow Textual's example
@@ -112,52 +127,44 @@ class Endpoint[T: Resource]:
             )
         ]
 
-    def to_str(self, resources: list[T] | T) -> str:
-        if not isinstance(resources, list):
-            resources = [resources]
-        result = {
-            str(self.resource): [
-                (
-                    resource.model_dump()
-                    if self.be_verbose
-                    else resource.model_dump(
-                        include=resource.get_marked_fields(SERIALIZE_ALWAYS_KEY)
-                    )
-                )
-                for resource in resources
-            ]
-        }
-
-        return self._to_str(result)
-
-    def list_resources(self, args: argparse.Namespace):
-        if hasattr(args, "id") and args.id:
-            if resource := self.get_one(args.id):
-                print(self.to_str(resource))
-            else:
-                print(self.to_str([]))
-        elif hasattr(args, "name") and args.name:
-            if resource := self.get_one_by_name(args.name):
-                print(self.to_str(resource))
-            else:
-                print(self.to_str([]))
-        elif hasattr(args, "filter") and args.filter:
-            print(self.to_str(self.find(args.filter)))
-        else:
-            self.get()
-            print(self.to_str(self.resources))
-
-    def _to_str(self, response: dict) -> str:
+    def _to_str(self, resources: dict) -> str:
         if self.be_verbose:
-            response["header"] = {
+            resources["header"] = {  # pyright: ignore[reportArgumentType]
                 "status_code": self.clouding.response.status_code,
             }
-            response["header"].update(self.clouding.response_header.model_dump())
+            resources["header"].update(self.clouding.response_header.model_dump())
+
         return json.dumps(
-            response,
+            resources,
             indent=4,
             sort_keys=True,
         )
+
+    def to_str(self) -> str:
+        resources = {
+            str(self.resource): [
+                resource.to_dict(self.be_verbose) for resource in self.resources
+            ]
+        }
+        return self._to_str(resources)
+
+    def list_resources(self, args: argparse.Namespace):
+        if hasattr(args, "id") and args.id:
+            if self.get_one(args.id):
+                print(self.to_str())
+            else:
+                print(self.to_str())
+        elif hasattr(args, "name") and args.name:
+            if self.get_one_by_name(args.name):
+                print(self.to_str())
+            else:
+                print(self.to_str())
+        elif hasattr(args, "filter") and args.filter:
+            self.find(args.filter)
+            print(self.to_str())
+        else:
+            self.get()
+            print(self.to_str())
 
     def _deserialize_resources(self, key: str = "") -> list[T]:
         result = []
@@ -174,18 +181,19 @@ class Endpoint[T: Resource]:
                     ]
                 )
             except KeyError:
-                log.error(f"response.json lacks key: {key}")
-                log.error(self.clouding.response.json())
-                exit(1)
+                raise DeserializationError(
+                    f"response.json lacks key: {key}", self.clouding.response.json()
+                )
             except ValidationError:
-                log.error(f"unable to deserialize contents of: {key}")
-                exit(1)
+                raise DeserializationError(
+                    f"unable to deserialize contents of: {key}",
+                    self.clouding.response.json(),
+                )
         elif self.clouding.is_status_not_found:
             # not a breaking error here, needs to be handled upstream
             log.debug("resource(s) not found")
         else:
-            log.error(f"HTTP status: {self.clouding.response.status_code}")
-            exit(1)
+            raise HttpError(f"HTTP status: {self.clouding.response.status_code}")
         return result
 
     def _deserialize_action(self, key: str = "") -> Action:
@@ -197,18 +205,18 @@ class Endpoint[T: Resource]:
                     else self.clouding.response.json()
                 )
             except KeyError:
-                log.error(f"response.json lacks action")
-                log.error(self.clouding.response.json())
-                exit(1)
+                raise DeserializationError(
+                    "response.json lacks action", self.clouding.response.json()
+                )
             except ValidationError:
-                log.error(f"unable to deserialize contents of action")
-                exit(1)
+                raise DeserializationError(
+                    "unable to deserialize contents of action",
+                    self.clouding.response.json(),
+                )
         elif self.clouding.is_status_not_found:
-            log.error("resource not found")
-            exit(1)
+            raise ResourceNotFoundError("resource not found")
         else:
-            log.error(f"HTTP status: {self.clouding.response.status_code}")
-            exit(1)
+            raise HttpError(f"HTTP status: {self.clouding.response.status_code}")
         return self.action
 
     @property

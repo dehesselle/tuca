@@ -3,10 +3,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import argparse
+import logging
 
-from tuca.clouding import setup_auth_cli
+from tuca.clouding import AuthError, setup_auth_cli
 from tuca.cost import setup_cost_cli
 from tuca.endpoints import (
+    EndpointError,
     setup_actions_cli,
     setup_firewalls_cli,
     setup_flavors_cli,
@@ -19,6 +21,8 @@ from tuca.endpoints import (
 from tuca.endpoints.endpoint import Endpoint
 from tuca.log import setup_logging
 from tuca.version import VERSION
+
+log = logging.getLogger("main")
 
 
 def main() -> None:
@@ -45,9 +49,13 @@ def main() -> None:
     setup_snapshots_cli(subparsers)
     setup_volumes_cli(subparsers)
     args = parser.parse_args()
-
     Endpoint.be_verbose = args.verbose
+
     try:
         args.func(args)
     except AttributeError:
         parser.print_usage()
+        exit(1)
+    except (AuthError, EndpointError) as e:
+        log.error(e)
+        exit(1)

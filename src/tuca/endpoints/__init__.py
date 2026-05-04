@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from .actions import setup_actions_cli
+from .endpoint import EndpointError
 from .firewalls import setup_firewalls_cli
 from .flavors import setup_flavors_cli
 from .images import setup_images_cli

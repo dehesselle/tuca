@@ -31,11 +31,10 @@ class ResourceNotFoundError(EndpointError):
 
 class DeserializationError(EndpointError):
     def __init__(self, message, response):
-        super().__init__(message)
-        self.response = response
+        super().__init__(message, response)
 
     def __str__(self):
-        return f"{self.message}\nresponse:\n{self.response}"
+        return f"{self.args[0]}\nresponse:\n{self.args[1]}"
 
 
 class HttpError(EndpointError):

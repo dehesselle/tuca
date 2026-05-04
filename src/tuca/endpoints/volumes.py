@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.resources.volumesize import VolumeSize
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -32,7 +32,7 @@ class Volumes(Endpoint[VolumeSize]):
 
 
 def list_volumes(args: argparse.Namespace):
-    Volumes().list_resources(args)
+    list_resources(Volumes(), args)
 
 
 def setup_volumes_cli(subparser: argparse._SubParsersAction):

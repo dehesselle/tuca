@@ -15,7 +15,7 @@ from slugify import slugify
 from tuca.resources.action import Action
 from tuca.resources.server import Server, Status
 
-from .endpoint import Endpoint, EndpointError, ResourceNotFoundError
+from .endpoint import Endpoint, EndpointError, ResourceNotFoundError, list_resources
 from .firewalls import Firewalls
 from .flavors import Flavors
 from .images import Images
@@ -210,7 +210,7 @@ def delete_server(args: argparse.Namespace):
 
 
 def list_servers(args: argparse.Namespace):
-    Servers().list_resources(args)
+    list_resources(Servers(), args)
 
 
 def start_server(args: argparse.Namespace):

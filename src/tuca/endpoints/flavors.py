@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.resources.flavor import Flavor
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -32,7 +32,7 @@ class Flavors(Endpoint[Flavor]):
 
 
 def list_flavors(args: argparse.Namespace):
-    Flavors().list_resources(args)
+    list_resources(Flavors(), args)
 
 
 def setup_flavors_cli(subparser: argparse._SubParsersAction):

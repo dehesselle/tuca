@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.resources.firewall import Firewall
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -28,7 +28,7 @@ class Firewalls(Endpoint[Firewall]):
 
 
 def list_firewalls(args: argparse.Namespace):
-    Firewalls().list_resources(args)
+    list_resources(Firewalls(), args)
 
 
 def setup_firewalls_cli(subparser: argparse._SubParsersAction):

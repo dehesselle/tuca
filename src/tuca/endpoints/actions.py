@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.resources.action import Action
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -34,7 +34,7 @@ class Actions(Endpoint[Action]):
 
 
 def list_actions(args: argparse.Namespace):
-    Actions().list_resources(args)
+    list_resources(Actions(), args)
 
 
 def setup_actions_cli(subparser: argparse._SubParsersAction):

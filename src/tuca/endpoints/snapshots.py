@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.resources.snapshot import Snapshot
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -27,7 +27,7 @@ class Snapshots(Endpoint[Snapshot]):
 
 
 def list_snapshots(args: argparse.Namespace):
-    Snapshots().list_resources(args)
+    list_resources(Snapshots(), args)
 
 
 def setup_snapshots_cli(subparser: argparse._SubParsersAction):

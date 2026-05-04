@@ -148,24 +148,6 @@ class Endpoint[T: Resource]:
         }
         return self._to_str(resources)
 
-    def list_resources(self, args: argparse.Namespace):
-        if hasattr(args, "id") and args.id:
-            if self.get_one(args.id):
-                print(self.to_str())
-            else:
-                print(self.to_str())
-        elif hasattr(args, "name") and args.name:
-            if self.get_one_by_name(args.name):
-                print(self.to_str())
-            else:
-                print(self.to_str())
-        elif hasattr(args, "filter") and args.filter:
-            self.find(args.filter)
-            print(self.to_str())
-        else:
-            self.get()
-            print(self.to_str())
-
     def _deserialize_resources(self, key: str = "") -> list[T]:
         result = []
         if self.clouding.is_status_ok:
@@ -237,3 +219,22 @@ class Endpoint[T: Resource]:
         return {
             cast(NamedResource, resource).name: resource for resource in self.resources
         }
+
+
+def list_resources(endpoint: Endpoint, args: argparse.Namespace):
+    if hasattr(args, "id") and args.id:
+        if endpoint.get_one(args.id):
+            print(endpoint.to_str())
+        else:
+            print(endpoint.to_str())
+    elif hasattr(args, "name") and args.name:
+        if endpoint.get_one_by_name(args.name):
+            print(endpoint.to_str())
+        else:
+            print(endpoint.to_str())
+    elif hasattr(args, "filter") and args.filter:
+        endpoint.find(args.filter)
+        print(endpoint.to_str())
+    else:
+        endpoint.get()
+        print(endpoint.to_str())

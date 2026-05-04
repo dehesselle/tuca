@@ -7,7 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.resources.image import Image
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -27,7 +27,7 @@ class Images(Endpoint[Image]):
 
 
 def list_images(args: argparse.Namespace):
-    Images().list_resources(args)
+    list_resources(Images(), args)
 
 
 def setup_images_cli(subparser: argparse._SubParsersAction):

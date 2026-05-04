@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from tuca.resources.keypair import Keypair
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, list_resources
 
 
 class Command(StrEnum):
@@ -55,7 +55,7 @@ def delete_keypair(args: argparse.Namespace):
 
 
 def list_keypairs(args: argparse.Namespace):
-    Keypairs().list_resources(args)
+    list_resources(Keypairs(), args)
 
 
 def setup_keypairs_cli(subparser: argparse._SubParsersAction):

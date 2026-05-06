@@ -4,3 +4,5 @@
 
 from .auth import AuthError, setup_auth_cli
 from .clouding import Clouding
+
+__all__ = ["AuthError", "setup_auth_cli", "Clouding"]

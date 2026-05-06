@@ -241,7 +241,7 @@ def stop_server(args: argparse.Namespace):
         raise ResourceNotFoundError("server not found")
 
 
-def setup_servers_cli(subparser: argparse._SubParsersAction):
+def add_servers_command(subparser: argparse._SubParsersAction):
     servers = subparser.add_parser("servers", help="server instances")
     server_actions = servers.add_subparsers(help="available commands")
 

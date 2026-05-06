@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .auth import AuthError, setup_auth_cli
+from .auth import AuthError, add_auth_command
 from .clouding import Clouding
 
-__all__ = ["AuthError", "setup_auth_cli", "Clouding"]
+__all__ = ["AuthError", "add_auth_command", "Clouding"]

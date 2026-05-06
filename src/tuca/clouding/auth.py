@@ -55,7 +55,7 @@ def delete_token(_) -> None:
     keyring.delete_password(SERVICENAME, USERNAME)
 
 
-def setup_auth_cli(subparser: _SubParsersAction):
+def add_auth_command(subparser: _SubParsersAction):
     auth = subparser.add_parser("auth", help="authentication")
     auth_actions = auth.add_subparsers()
     auth_action_set = auth_actions.add_parser(Command.CREATE, help="set API token")

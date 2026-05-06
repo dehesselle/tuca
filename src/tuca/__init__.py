@@ -5,17 +5,17 @@
 import argparse
 import logging
 
-from tuca.clouding import AuthError, setup_auth_cli
-from tuca.cost import setup_cost_cli
-from tuca.endpoints.actions import setup_actions_cli
+from tuca.clouding import AuthError, add_auth_command
+from tuca.cost import add_cost_command
+from tuca.endpoints.actions import add_actions_command
 from tuca.endpoints.endpoint import Endpoint, EndpointError
-from tuca.endpoints.firewalls import setup_firewalls_cli
-from tuca.endpoints.flavors import setup_flavors_cli
-from tuca.endpoints.images import setup_images_cli
-from tuca.endpoints.keypairs import setup_keypairs_cli
-from tuca.endpoints.servers import setup_servers_cli
-from tuca.endpoints.snapshots import setup_snapshots_cli
-from tuca.endpoints.volumes import setup_volumes_cli
+from tuca.endpoints.firewalls import add_firewalls_command
+from tuca.endpoints.flavors import add_flavors_command
+from tuca.endpoints.images import add_images_command
+from tuca.endpoints.keypairs import add_keypairs_command
+from tuca.endpoints.servers import add_servers_command
+from tuca.endpoints.snapshots import add_snapshots_command
+from tuca.endpoints.volumes import add_volumes_command
 from tuca.log import setup_logging
 from tuca.version import VERSION
 
@@ -34,17 +34,18 @@ def main() -> None:
         help="make output verbose",
     )
     parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
-    subparsers = parser.add_subparsers(dest="endpoint", help="accessible endpoints")
-    setup_actions_cli(subparsers)
-    setup_auth_cli(subparsers)  # not an endpoint
-    setup_cost_cli(subparsers)  # not an endpoint
-    setup_firewalls_cli(subparsers)
-    setup_flavors_cli(subparsers)
-    setup_images_cli(subparsers)
-    setup_keypairs_cli(subparsers)
-    setup_servers_cli(subparsers)
-    setup_snapshots_cli(subparsers)
-    setup_volumes_cli(subparsers)
+    commands = parser.add_subparsers(help="available commands")
+    add_actions_command(commands)
+    add_auth_command(commands)
+    add_cost_command(commands)
+    add_firewalls_command(commands)
+    add_flavors_command(commands)
+    add_images_command(commands)
+    add_keypairs_command(commands)
+    add_servers_command(commands)
+    add_snapshots_command(commands)
+    add_volumes_command(commands)
+
     args = parser.parse_args()
     Endpoint.be_verbose = args.verbose
 

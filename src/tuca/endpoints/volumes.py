@@ -35,7 +35,7 @@ def list_volumes(args: argparse.Namespace):
     list_resources(Volumes(), args)
 
 
-def setup_volumes_cli(subparser: argparse._SubParsersAction):
+def add_volumes_command(subparser: argparse._SubParsersAction):
     volumes = subparser.add_parser("volumes", help="volume sizes")
     volumes_actions = volumes.add_subparsers(help="available commands")
     volumes_action_list = volumes_actions.add_parser(

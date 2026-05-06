@@ -30,7 +30,7 @@ def list_snapshots(args: argparse.Namespace):
     list_resources(Snapshots(), args)
 
 
-def setup_snapshots_cli(subparser: argparse._SubParsersAction):
+def add_snapshots_command(subparser: argparse._SubParsersAction):
     snapshots = subparser.add_parser("snapshots", help="server snapshots")
     snapshot_actions = snapshots.add_subparsers(help="available commands")
     snapshot_action_list = snapshot_actions.add_parser(

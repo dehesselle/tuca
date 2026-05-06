@@ -31,7 +31,7 @@ def list_firewalls(args: argparse.Namespace):
     list_resources(Firewalls(), args)
 
 
-def setup_firewalls_cli(subparser: argparse._SubParsersAction):
+def add_firewalls_command(subparser: argparse._SubParsersAction):
     firewalls = subparser.add_parser("firewalls", help="firewalls and rules")
     firewall_actions = firewalls.add_subparsers(help="available commands")
 

@@ -52,6 +52,6 @@ def print_total_cost_per_hour(_) -> None:
     )
 
 
-def setup_cost_cli(subparser: _SubParsersAction):
+def add_cost_command(subparser: _SubParsersAction):
     cost = subparser.add_parser("cost", help="hourly costs")
     cost.set_defaults(func=print_total_cost_per_hour)

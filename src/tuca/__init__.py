@@ -7,18 +7,15 @@ import logging
 
 from tuca.clouding import AuthError, setup_auth_cli
 from tuca.cost import setup_cost_cli
-from tuca.endpoints import (
-    EndpointError,
-    setup_actions_cli,
-    setup_firewalls_cli,
-    setup_flavors_cli,
-    setup_images_cli,
-    setup_keypairs_cli,
-    setup_servers_cli,
-    setup_snapshots_cli,
-    setup_volumes_cli,
-)
-from tuca.endpoints.endpoint import Endpoint
+from tuca.endpoints.actions import setup_actions_cli
+from tuca.endpoints.endpoint import Endpoint, EndpointError
+from tuca.endpoints.firewalls import setup_firewalls_cli
+from tuca.endpoints.flavors import setup_flavors_cli
+from tuca.endpoints.images import setup_images_cli
+from tuca.endpoints.keypairs import setup_keypairs_cli
+from tuca.endpoints.servers import setup_servers_cli
+from tuca.endpoints.snapshots import setup_snapshots_cli
+from tuca.endpoints.volumes import setup_volumes_cli
 from tuca.log import setup_logging
 from tuca.version import VERSION
 

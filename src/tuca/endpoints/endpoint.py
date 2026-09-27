@@ -5,7 +5,7 @@
 import argparse
 import json
 import logging
-from typing import Type, cast
+from typing import cast
 
 from pydantic import BaseModel, ValidationError
 from urlpath import URL
@@ -46,7 +46,7 @@ class Endpoint[T: Resource]:
 
     be_verbose: bool = False
 
-    def __init__(self, resource_type: Type[T], resource: str):
+    def __init__(self, resource_type: type[T], resource: str):
         self.clouding = Clouding()
         self.resources: list[T] = []
         self.resource_type = resource_type

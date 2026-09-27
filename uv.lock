@@ -392,19 +392,24 @@ wheels = [
 name = "tuca"
 source = { editable = "." }
 dependencies = [
-    { name = "keyring" },
     { name = "pydantic" },
     { name = "python-slugify" },
     { name = "requests" },
 ]
 
+[package.optional-dependencies]
+keyring = [
+    { name = "keyring" },
+]
+
 [package.metadata]
 requires-dist = [
-    { name = "keyring", specifier = ">=25.7.0" },
+    { name = "keyring", marker = "extra == 'keyring'", specifier = ">=25.7.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "python-slugify", specifier = ">=8.0.4" },
     { name = "requests", specifier = ">=2.32.5" },
 ]
+provides-extras = ["keyring"]
 
 [[package]]
 name = "typing-extensions"

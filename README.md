@@ -62,7 +62,13 @@ First order of business is setting up an API token. You can do that via environm
 export CLOUDINGIO_API_TOKEN=my_secret_token
 ```
 
-Or, more securely, have tuca write it into your system's keyring. The following command will give you an interactive prompt to do that:
+Or, more securely, have tuca write it into your system's keyring. Keyring support is optional, install tuca with the `keyring` extra to enable it:
+
+```bash
+uv tool install 'tuca[keyring]'
+```
+
+The following command will give you an interactive prompt to store the token:
 
 ```bash
 tuca auth create

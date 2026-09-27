@@ -8,13 +8,19 @@ from argparse import _SubParsersAction
 from enum import StrEnum, auto
 from getpass import getpass
 
-import keyring
-from keyring.errors import NoKeyringError
-
 SERVICENAME = "CLOUDINGIO_API_TOKEN"
 USERNAME = "tuca"
 
 log = logging.getLogger("auth")
+
+
+def _get_keyring():
+    """import keyring on demand, it's an optional dependency (tuca[keyring])"""
+    try:
+        import keyring.errors
+    except ImportError:
+        return None
+    return keyring
 
 
 class AuthError(Exception):
@@ -27,10 +33,12 @@ class Command(StrEnum):
 
 
 def set_token(_) -> None:
+    if (keyring := _get_keyring()) is None:
+        raise AuthError("keyring support not installed")
     token = getpass("API token:")
     try:
         keyring.set_password(SERVICENAME, USERNAME, token)
-    except NoKeyringError:
+    except keyring.errors.NoKeyringError:
         raise AuthError("no keyring available")
 
 
@@ -38,6 +46,9 @@ def get_token() -> str:
     if api_token := os.getenv(SERVICENAME):
         log.debug("auth via environment variable")
         return api_token
+    elif (keyring := _get_keyring()) is None:
+        log.debug("no environment var and no keyring support")
+        raise AuthError("no authentication provided")
     else:
         try:
             if api_token := keyring.get_password(SERVICENAME, USERNAME):
@@ -46,12 +57,14 @@ def get_token() -> str:
             else:
                 log.debug("no environment var and empty keyring")
                 raise AuthError("no authentication provided")
-        except NoKeyringError:
+        except keyring.errors.NoKeyringError:
             log.debug("no environment var and keyring inaccessible")
             raise AuthError("no authentication provided")
 
 
 def delete_token(_) -> None:
+    if (keyring := _get_keyring()) is None:
+        raise AuthError("keyring support not installed")
     keyring.delete_password(SERVICENAME, USERNAME)
 
 

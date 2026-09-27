@@ -148,13 +148,14 @@ class Endpoint[T: Resource]:
             sort_keys=True,
         )
 
-    def to_str(self) -> str:
-        resources = {
+    def to_str(self, resources: list[T] | None = None) -> str:
+        resources_dict = {
             str(self.resource): [
-                resource.to_dict(self.be_verbose) for resource in self.resources
+                resource.to_dict(self.be_verbose)
+                for resource in (resources or self.resources)
             ]
         }
-        return self._to_str(resources)
+        return self._to_str(resources_dict)
 
     def _deserialize_resources(self, key: str = "") -> list[T]:
         result = []
@@ -241,8 +242,7 @@ def list_resources(endpoint: Endpoint, args: argparse.Namespace):
         else:
             print(endpoint.to_str())
     elif hasattr(args, "filter") and args.filter:
-        endpoint.find(args.filter)
-        print(endpoint.to_str())
+        print(endpoint.to_str(endpoint.find(args.filter)))
     else:
         endpoint.get()
         print(endpoint.to_str())

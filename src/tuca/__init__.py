@@ -6,8 +6,8 @@ import argparse
 import logging
 import sys
 
-from tuca.cli.images import add_images_command
-from tuca.cli.volumes import add_volumes_command
+from tuca.cli.images import add_command_images
+from tuca.cli.volumes import add_command_volumes
 from tuca.clouding import AuthError, add_auth_command
 from tuca.cost import add_cost_command
 from tuca.endpoints.actions import add_actions_command
@@ -41,11 +41,11 @@ def main() -> None:
     add_cost_command(commands)
     add_firewalls_command(commands)
     add_flavors_command(commands)
-    add_images_command(commands)
+    add_command_images(commands)
     add_keypairs_command(commands)
     add_servers_command(commands)
     add_snapshots_command(commands)
-    add_volumes_command(commands)
+    add_command_volumes(commands)
 
     args = parser.parse_args()
     Endpoint.be_verbose = args.verbose

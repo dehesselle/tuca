@@ -43,10 +43,11 @@ def create_server(client: Client, args: argparse.Namespace):
 
 def delete_server(client: Client, args: argparse.Namespace):
     if args.name:
-        if action := client.servers.delete_by_name(args.name):
-            print(to_str(client.actions, [action]))
+        action = client.servers.delete_by_name(args.name)
     else:
-        client.servers.delete(args.id)
+        action = client.servers.delete(args.id)
+    if action:
+        print(to_str(client.actions, [action]))
 
 
 def list_servers(client: Client, args: argparse.Namespace):

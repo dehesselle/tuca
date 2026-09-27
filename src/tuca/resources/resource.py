@@ -25,9 +25,8 @@ class Resource(BaseModel):
 
         for field_name, field_info in cls.model_fields.items():
             extra = field_info.json_schema_extra
-            if type(extra) is dict and not callable(extra):  # for Pyright
-                if key in extra.keys():
-                    result.add(field_name)
+            if type(extra) is dict and not callable(extra) and key in extra:
+                result.add(field_name)
 
         return result
 

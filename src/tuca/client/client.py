@@ -59,7 +59,6 @@ class Client:
         self.response_header = ResponseHeader()
         self.response_page_size = 100
         self.pagination = Pagination()
-        self.action: Action | None = None
         self.actions = Actions(self)
         self.firewalls = Firewalls(self)
         self.flavors = Flavors(self)
@@ -90,14 +89,16 @@ class Client:
         )
         self._process_response()
 
-    def delete(self, resource: str, id: str):
+    def delete(self, resource: str, id: str) -> Action | None:
         self.resource = resource
         self.response = requests.delete(
             f"{self.base_url}/{resource}/{id}", headers=self.authentication
         )
-        if self.has_content:
-            self.action = Action.model_validate(self.response.json())
+        action = (
+            Action.model_validate(self.response.json()) if self.has_content else None
+        )
         self._process_response()
+        return action
 
     def next(self) -> bool:
         if url := self.pagination.links.next:

@@ -60,8 +60,7 @@ class Endpoint[T: Resource]:
         return next(iter(self._deserialize_resources()), None)
 
     def delete(self, id: str) -> Action | None:
-        self.client.delete(self.resource_name, id)
-        return self.client.action
+        return self.client.delete(self.resource_name, id)
 
     def delete_by_name(self, name: str) -> Action | None:
         if resource := self.get_one_by_name(name):

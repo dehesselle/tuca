@@ -2,14 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import json
-from argparse import _SubParsersAction
-from enum import StrEnum, auto
+from __future__ import annotations
 
-from tuca.endpoints.flavors import Flavors
-from tuca.endpoints.images import Images
-from tuca.endpoints.servers import Servers
-from tuca.endpoints.snapshots import Snapshots
+from enum import StrEnum, auto
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tuca.client import Client
 
 
 class Expense(StrEnum):
@@ -19,16 +18,11 @@ class Expense(StrEnum):
     TOTAL = auto()
 
 
-def print_total_cost_per_hour(_) -> None:
+def compute_hourly_cost(client: Client) -> dict[str, float]:
     """collect incurring cost of all resources
 
     This accounts only for images, servers and snapshots.
     """
-    servers = Servers()
-    flavors = Flavors()
-    images = Images()
-    snapshots = Snapshots()
-
     cost = {
         Expense.IMAGES.value: 0.0,
         Expense.SERVERS.value: 0.0,
@@ -36,22 +30,11 @@ def print_total_cost_per_hour(_) -> None:
         Expense.TOTAL.value: 0.0,
     }
 
-    for server in servers.get():
-        cost[Expense.SERVERS] += flavors.by_id[server.flavor].pricePerHour
-        cost[Expense.IMAGES] += images.by_id[server.image.id].pricePerHour
-    for snapshot in snapshots.get():
+    for server in client.servers.get():
+        cost[Expense.SERVERS] += client.flavors.by_id[server.flavor].pricePerHour
+        cost[Expense.IMAGES] += client.images.by_id[server.image.id].pricePerHour
+    for snapshot in client.snapshots.get():
         cost[Expense.SNAPSHOTS] += snapshot.cost.pricePerHour
 
     cost[Expense.TOTAL] = sum(cost.values())
-    print(
-        json.dumps(
-            {"cost": cost},
-            indent=4,
-            sort_keys=True,
-        )
-    )
-
-
-def add_cost_command(subparser: _SubParsersAction):
-    cost = subparser.add_parser("cost", help="hourly costs")
-    cost.set_defaults(func=print_total_cost_per_hour)
+    return cost

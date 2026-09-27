@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from tuca.clouding import Clouding
+from tuca.endpoints.flavors import Flavors
 from tuca.endpoints.images import Images
 from tuca.endpoints.volumes import Volumes
 
@@ -17,5 +18,6 @@ class Client(Clouding):
 
     def __init__(self, token: str):
         super().__init__(token)
+        self.flavors = Flavors(self)
         self.images = Images(self)
         self.volumes = Volumes(self)

@@ -2,16 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import argparse
-from enum import StrEnum, auto
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from tuca.resources.flavor import Flavor
 
-from .endpoint import Endpoint, list_resources
+from .endpoint import Endpoint
 
-
-class Command(StrEnum):
-    LIST = auto()
+if TYPE_CHECKING:
+    from tuca.client import Client
 
 
 class Flavors(Endpoint[Flavor]):
@@ -21,25 +21,11 @@ class Flavors(Endpoint[Flavor]):
        https://api.clouding.io/docs/#tag/Sizes/operation/ListAllFlavors
     """
 
-    def __init__(self):
-        super().__init__(Flavor, "sizes/flavors")
+    def __init__(self, client: Client | None = None):
+        super().__init__(Flavor, "sizes/flavors", client)
         self.response_key = "flavors"
 
     @property
     def all(self) -> list[str]:
         self.get()
         return [flavor.id for flavor in self.resources]
-
-
-def list_flavors(args: argparse.Namespace):
-    list_resources(Flavors(), args)
-
-
-def add_flavors_command(subparser: argparse._SubParsersAction):
-    flavors = subparser.add_parser("flavors", help="sizing as cpu/memory combinations")
-    flavors_actions = flavors.add_subparsers(help="available commands")
-    flavors_action_list = flavors_actions.add_parser(
-        Command.LIST, help="list available flavors"
-    )
-    flavors_action_list.set_defaults(func=list_flavors)
-    flavors_action_list.set_defaults(func=list_flavors)

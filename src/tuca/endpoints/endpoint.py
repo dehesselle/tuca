@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import logging
 from typing import TYPE_CHECKING, cast
@@ -80,14 +79,9 @@ class Endpoint[T: Resource]:
         self.client.delete(self.resource, id)
         return self.client.action
 
-    def delete_by_name(self, name: str):
+    def delete_by_name(self, name: str) -> Action | None:
         if resource := self.get_one_by_name(name):
-            resource_id = cast(NamedResource, resource).id
-
-            if action := self.delete(
-                resource_id
-            ):  # not every delete request produces an action
-                print(self._to_str({"actions": [action.to_dict(self.be_verbose)]}))
+            return self.delete(cast(NamedResource, resource).id)
         else:
             raise ResourceNotFoundError(f"resource name not found: {name}")
 
@@ -231,19 +225,3 @@ class Endpoint[T: Resource]:
         return {
             cast(NamedResource, resource).name: resource for resource in self.resources
         }
-
-
-def list_resources(endpoint: Endpoint, args: argparse.Namespace):
-    if hasattr(args, "id") and args.id:
-        if endpoint.get_one(args.id):
-            print(endpoint.to_str())
-        else:
-            print(endpoint.to_str())
-    elif hasattr(args, "name") and args.name:
-        resource = endpoint.get_one_by_name(args.name)
-        print(endpoint.to_str([resource] if resource else []))
-    elif hasattr(args, "filter") and args.filter:
-        print(endpoint.to_str(endpoint.find(args.filter)))
-    else:
-        endpoint.get()
-        print(endpoint.to_str())

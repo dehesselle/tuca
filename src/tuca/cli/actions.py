@@ -6,8 +6,8 @@ import argparse
 from enum import StrEnum, auto
 
 from tuca.cli.auth import get_token
+from tuca.cli.endpoint import list_resources
 from tuca.client import Client
-from tuca.endpoints.endpoint import list_resources
 
 
 class Command(StrEnum):

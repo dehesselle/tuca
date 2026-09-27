@@ -237,10 +237,8 @@ def list_resources(endpoint: Endpoint, args: argparse.Namespace):
         else:
             print(endpoint.to_str())
     elif hasattr(args, "name") and args.name:
-        if endpoint.get_one_by_name(args.name):
-            print(endpoint.to_str())
-        else:
-            print(endpoint.to_str())
+        resource = endpoint.get_one_by_name(args.name)
+        print(endpoint.to_str([resource] if resource else []))
     elif hasattr(args, "filter") and args.filter:
         print(endpoint.to_str(endpoint.find(args.filter)))
     else:

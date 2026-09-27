@@ -8,7 +8,6 @@ import logging
 from typing import TYPE_CHECKING, cast
 
 from pydantic import BaseModel, ValidationError
-from urlpath import URL
 
 from tuca.resources.action import Action
 from tuca.resources.resource import (
@@ -50,7 +49,7 @@ class Endpoint[T: Resource]:
         self.client = client
         self.resources: list[T] = []
         self.resource_type = resource_type
-        self.resource = URL(resource)
+        self.resource = resource
         self.response_key = resource
 
     def _create(self, payload: BaseModel) -> list[T]:
@@ -88,7 +87,7 @@ class Endpoint[T: Resource]:
 
     def get_one(self, id: str) -> T | None:
         self.resources.clear()
-        self.client.get(self.resource / id)
+        self.client.get(f"{self.resource}/{id}")
         self.resources.extend(self._deserialize_resources())
         try:
             return self.resources[0]

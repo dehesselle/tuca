@@ -7,7 +7,6 @@ import logging
 from http import HTTPStatus
 
 import requests
-from urlpath import URL
 
 from tuca.endpoints.actions import Actions
 from tuca.endpoints.firewalls import Firewalls
@@ -53,9 +52,9 @@ class Client:
     """
 
     def __init__(self, token: str):
-        self.base_url = URL("https://api.clouding.io/v1")
+        self.base_url = "https://api.clouding.io/v1"
         self.authentication = {"X-API-KEY": token}
-        self.resource = URL("")
+        self.resource = ""
         self.response = requests.Response()
         self.response_header = ResponseHeader()
         self.response_page_size = 100
@@ -70,30 +69,31 @@ class Client:
         self.snapshots = Snapshots(self)
         self.volumes = Volumes(self)
 
-    def get(self, resource: URL):
+    def get(self, resource: str):
         self.resource = resource
         self.response = requests.get(
-            str(self.base_url / resource / f"?pageSize={self.response_page_size}"),
+            f"{self.base_url}/{resource}",
+            params={"pageSize": self.response_page_size},
             headers=self.authentication,
         )
         self._process_response()
 
     def post(
-        self, resource: URL, payload: dict | None = None, headers: dict | None = None
+        self, resource: str, payload: dict | None = None, headers: dict | None = None
     ):
         payload = payload or {}
         headers = headers or {}
         self.resource = resource
         headers.update(self.authentication)
         self.response = requests.post(
-            str(self.base_url / resource), data=json.dumps(payload), headers=headers
+            f"{self.base_url}/{resource}", data=json.dumps(payload), headers=headers
         )
         self._process_response()
 
-    def delete(self, resource: URL, id: str):
+    def delete(self, resource: str, id: str):
         self.resource = resource
         self.response = requests.delete(
-            str(self.base_url / resource / id), headers=self.authentication
+            f"{self.base_url}/{resource}/{id}", headers=self.authentication
         )
         if self.has_content:
             self.action = Action.model_validate(self.response.json())

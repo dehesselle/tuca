@@ -8,6 +8,7 @@ from tuca.endpoints.firewalls import Firewalls
 from tuca.endpoints.flavors import Flavors
 from tuca.endpoints.images import Images
 from tuca.endpoints.keypairs import Keypairs
+from tuca.endpoints.servers import Servers
 from tuca.endpoints.snapshots import Snapshots
 from tuca.endpoints.volumes import Volumes
 
@@ -27,5 +28,6 @@ class Client(Clouding):
         self.flavors = Flavors(self)
         self.images = Images(self)
         self.keypairs = Keypairs(self)
+        self.servers = Servers(self)
         self.snapshots = Snapshots(self)
         self.volumes = Volumes(self)

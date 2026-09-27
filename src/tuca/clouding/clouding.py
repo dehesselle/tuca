@@ -11,7 +11,6 @@ from urlpath import URL
 
 from tuca.resources.action import Action
 
-from .auth import get_token
 from .response import Pagination, ResponseHeader
 
 log = logging.getLogger("clouding")
@@ -44,9 +43,9 @@ class Clouding:
        https://api.clouding.io/docs/#section/Introduction
     """
 
-    def __init__(self):
+    def __init__(self, token: str):
         self.base_url = URL("https://api.clouding.io/v1")
-        self.authentication = {"X-API-KEY": get_token(None)}
+        self.authentication = {"X-API-KEY": token}
         self.resource = URL("")
         self.response = requests.Response()
         self.response_header = ResponseHeader()

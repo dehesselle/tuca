@@ -2,16 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import argparse
-from enum import StrEnum, auto
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from tuca.resources.volumesize import VolumeSize
 
-from .endpoint import Endpoint, list_resources
+from .endpoint import Endpoint
 
-
-class Command(StrEnum):
-    LIST = auto()
+if TYPE_CHECKING:
+    from tuca.client import Client
 
 
 class Volumes(Endpoint[VolumeSize]):
@@ -21,24 +21,11 @@ class Volumes(Endpoint[VolumeSize]):
       https://api.clouding.io/docs/#tag/Sizes/operation/ListAllVolumeSizes
     """
 
-    def __init__(self):
-        super().__init__(VolumeSize, "sizes/volumes")
+    def __init__(self, client: Client | None = None):
+        super().__init__(VolumeSize, "sizes/volumes", client)
         self.response_key = "volumeSizes"
 
     @property
     def all(self) -> list[int]:
         self.get()
         return [volumesize.sizeGb for volumesize in self.resources]
-
-
-def list_volumes(args: argparse.Namespace):
-    list_resources(Volumes(), args)
-
-
-def add_volumes_command(subparser: argparse._SubParsersAction):
-    volumes = subparser.add_parser("volumes", help="volume sizes")
-    volumes_actions = volumes.add_subparsers(help="available commands")
-    volumes_action_list = volumes_actions.add_parser(
-        Command.LIST, help="list volume sizes"
-    )
-    volumes_action_list.set_defaults(func=list_volumes)

@@ -2,21 +2,27 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from __future__ import annotations
+
 import argparse
 import json
 import logging
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from pydantic import BaseModel, ValidationError
 from urlpath import URL
 
 from tuca.clouding import Clouding
+from tuca.clouding.auth import get_token
 from tuca.resources.action import Action
 from tuca.resources.resource import (
     IdentifiableResource,
     NamedResource,
     Resource,
 )
+
+if TYPE_CHECKING:
+    from tuca.client import Client
 
 log = logging.getLogger("endpoint")
 
@@ -46,8 +52,11 @@ class Endpoint[T: Resource]:
 
     be_verbose: bool = False
 
-    def __init__(self, resource_type: type[T], resource: str):
-        self.clouding = Clouding()
+    def __init__(
+        self, resource_type: type[T], resource: str, client: Client | None = None
+    ):
+        # TODO: temporary fallback until every endpoint is created by Client
+        self.clouding = client or Clouding(get_token(None))
         self.resources: list[T] = []
         self.resource_type = resource_type
         self.resource = URL(resource)

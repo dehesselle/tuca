@@ -26,6 +26,6 @@ class Flavors(Endpoint[Flavor]):
         self.response_key = "flavors"
 
     @property
-    def all(self) -> list[str]:
+    def ids(self) -> list[str]:
         self.get()
         return [flavor.id for flavor in self.resources]

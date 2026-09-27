@@ -69,7 +69,7 @@ class Servers(Endpoint[Server]):
         firewall: str,
         wait_until_active: bool = False,
     ) -> Server:
-        if flavor_id not in self.client.flavors.all:
+        if flavor_id not in self.client.flavors.ids:
             raise CreateServerError(f"flavor not supported: {flavor_id}")
 
         if firewall:

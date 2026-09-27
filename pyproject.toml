@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [project.scripts]
-tuca = "tuca:main"
+tuca = "tuca.cli:main"
 
 [project.urls]
 "Source" = "https://github.com/dehesselle/tuca"

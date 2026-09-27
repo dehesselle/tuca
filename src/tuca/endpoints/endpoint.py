@@ -12,8 +12,6 @@ from typing import TYPE_CHECKING, cast
 from pydantic import BaseModel, ValidationError
 from urlpath import URL
 
-from tuca.clouding import Clouding
-from tuca.clouding.auth import get_token
 from tuca.resources.action import Action
 from tuca.resources.resource import (
     IdentifiableResource,
@@ -56,7 +54,12 @@ class Endpoint[T: Resource]:
         self, resource_type: type[T], resource: str, client: Client | None = None
     ):
         # TODO: temporary fallback until every endpoint is created by Client
-        self.clouding = client or Clouding(get_token(None))
+        if client is None:
+            from tuca.cli.auth import get_token
+            from tuca.client import Client
+
+            client = Client(get_token(None))
+        self.client = client
         self.resources: list[T] = []
         self.resource_type = resource_type
         self.resource = URL(resource)
@@ -64,7 +67,7 @@ class Endpoint[T: Resource]:
 
     def _create(self, payload: BaseModel) -> list[T]:
         self.resources.clear()
-        self.clouding.post(
+        self.client.post(
             self.resource,
             payload.model_dump(),
             headers={"Content-Type": "application/json"},
@@ -74,8 +77,8 @@ class Endpoint[T: Resource]:
 
     def delete(self, id: str) -> Action | None:
         self.resources.clear()
-        self.clouding.delete(self.resource, id)
-        return self.clouding.action
+        self.client.delete(self.resource, id)
+        return self.client.action
 
     def delete_by_name(self, name: str):
         if resource := self.get_one_by_name(name):
@@ -94,15 +97,15 @@ class Endpoint[T: Resource]:
 
     def get(self) -> list[T]:
         self.resources.clear()
-        self.clouding.get(self.resource)
+        self.client.get(self.resource)
         self.resources.extend(self._deserialize_resources(self.response_key))
-        while self.clouding.next():  # pagination
+        while self.client.next():  # pagination
             self.resources.extend(self._deserialize_resources(self.response_key))
         return self.resources
 
     def get_one(self, id: str) -> T | None:
         self.resources.clear()
-        self.clouding.get(self.resource / id)
+        self.client.get(self.resource / id)
         self.resources.extend(self._deserialize_resources())
         try:
             return self.resources[0]
@@ -138,9 +141,9 @@ class Endpoint[T: Resource]:
     def _to_str(self, resources: dict) -> str:
         if self.be_verbose:
             resources["header"] = {  # pyright: ignore[reportArgumentType]
-                "status_code": self.clouding.response.status_code,
+                "status_code": self.client.response.status_code,
             }
-            resources["header"].update(self.clouding.response_header.model_dump())
+            resources["header"].update(self.client.response_header.model_dump())
 
         return json.dumps(
             resources,
@@ -159,55 +162,55 @@ class Endpoint[T: Resource]:
 
     def _deserialize_resources(self, key: str = "") -> list[T]:
         result = []
-        if self.clouding.is_status_ok:
+        if self.client.is_status_ok:
             try:
                 result.extend(
                     [
                         self.resource_type.model_validate(_)
                         for _ in (
-                            self.clouding.response.json()[key]
+                            self.client.response.json()[key]
                             if key
-                            else [self.clouding.response.json()]
+                            else [self.client.response.json()]
                         )
                     ]
                 )
             except KeyError:
                 raise DeserializationError(
-                    f"response.json lacks key: {key}", self.clouding.response.json()
+                    f"response.json lacks key: {key}", self.client.response.json()
                 )
             except ValidationError:
                 raise DeserializationError(
                     f"unable to deserialize contents of: {key}",
-                    self.clouding.response.json(),
+                    self.client.response.json(),
                 )
-        elif self.clouding.is_status_not_found:
+        elif self.client.is_status_not_found:
             # not a breaking error here, needs to be handled upstream
             log.debug("resource(s) not found")
         else:
-            raise HttpError(f"HTTP status: {self.clouding.response.status_code}")
+            raise HttpError(f"HTTP status: {self.client.response.status_code}")
         return result
 
     def _deserialize_action(self, key: str = "") -> Action:
-        if self.clouding.is_status_ok:
+        if self.client.is_status_ok:
             try:
                 self.action = Action.model_validate(
-                    self.clouding.response.json()[key]
+                    self.client.response.json()[key]
                     if key
-                    else self.clouding.response.json()
+                    else self.client.response.json()
                 )
             except KeyError:
                 raise DeserializationError(
-                    "response.json lacks action", self.clouding.response.json()
+                    "response.json lacks action", self.client.response.json()
                 )
             except ValidationError:
                 raise DeserializationError(
                     "unable to deserialize contents of action",
-                    self.clouding.response.json(),
+                    self.client.response.json(),
                 )
-        elif self.clouding.is_status_not_found:
+        elif self.client.is_status_not_found:
             raise ResourceNotFoundError("resource not found")
         else:
-            raise HttpError(f"HTTP status: {self.clouding.response.status_code}")
+            raise HttpError(f"HTTP status: {self.client.response.status_code}")
         return self.action
 
     @property

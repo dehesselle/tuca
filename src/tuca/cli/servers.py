@@ -7,8 +7,8 @@ import platform
 import signal
 from enum import StrEnum, auto
 
+from tuca.cli.auth import get_token
 from tuca.client import Client
-from tuca.clouding.auth import get_token
 from tuca.endpoints.endpoint import ResourceNotFoundError, list_resources
 
 

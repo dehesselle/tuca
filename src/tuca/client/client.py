@@ -9,11 +9,19 @@ from http import HTTPStatus
 import requests
 from urlpath import URL
 
+from tuca.endpoints.actions import Actions
+from tuca.endpoints.firewalls import Firewalls
+from tuca.endpoints.flavors import Flavors
+from tuca.endpoints.images import Images
+from tuca.endpoints.keypairs import Keypairs
+from tuca.endpoints.servers import Servers
+from tuca.endpoints.snapshots import Snapshots
+from tuca.endpoints.volumes import Volumes
 from tuca.resources.action import Action
 
 from .response import Pagination, ResponseHeader
 
-log = logging.getLogger("clouding")
+log = logging.getLogger("client")
 
 
 ValidStatusCodes = (
@@ -32,10 +40,11 @@ ValidStatusCodes = (
 )  # https://api.clouding.io/docs/#section/Introduction/Responses
 
 
-class Clouding:
-    """low-level API wrapper
+class Client:
+    """entry point for using tuca as a library
 
-    This class wraps the basic operations from the requests package and adds some
+    The client does the HTTP work itself; its endpoints call back into it.
+    It wraps the basic operations from the requests package and adds some
     Clouding specifics (authentication, simple pagination).
     See the `introduction`_ section of the documentation.
 
@@ -52,6 +61,14 @@ class Clouding:
         self.response_page_size = 100
         self.pagination = Pagination()
         self.action: Action | None = None
+        self.actions = Actions(self)
+        self.firewalls = Firewalls(self)
+        self.flavors = Flavors(self)
+        self.images = Images(self)
+        self.keypairs = Keypairs(self)
+        self.servers = Servers(self)
+        self.snapshots = Snapshots(self)
+        self.volumes = Volumes(self)
 
     def get(self, resource: URL):
         self.resource = resource

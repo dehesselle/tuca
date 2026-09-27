@@ -62,7 +62,11 @@ class Clouding:
         )
         self._process_response()
 
-    def post(self, resource: URL, payload: dict = {}, headers: dict = {}):
+    def post(
+        self, resource: URL, payload: dict | None = None, headers: dict | None = None
+    ):
+        payload = payload or {}
+        headers = headers or {}
         self.resource = resource
         headers.update(self.authentication)
         self.response = requests.post(

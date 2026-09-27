@@ -6,6 +6,7 @@ import argparse
 import logging
 import sys
 
+from tuca.cli.firewalls import add_command_firewalls
 from tuca.cli.flavors import add_command_flavors
 from tuca.cli.images import add_command_images
 from tuca.cli.volumes import add_command_volumes
@@ -13,7 +14,6 @@ from tuca.clouding import AuthError, add_auth_command
 from tuca.cost import add_cost_command
 from tuca.endpoints.actions import add_actions_command
 from tuca.endpoints.endpoint import Endpoint, EndpointError
-from tuca.endpoints.firewalls import add_firewalls_command
 from tuca.endpoints.keypairs import add_keypairs_command
 from tuca.endpoints.servers import add_servers_command
 from tuca.endpoints.snapshots import add_snapshots_command
@@ -39,7 +39,7 @@ def main() -> None:
     add_actions_command(commands)
     add_auth_command(commands)
     add_cost_command(commands)
-    add_firewalls_command(commands)
+    add_command_firewalls(commands)
     add_command_flavors(commands)
     add_command_images(commands)
     add_keypairs_command(commands)

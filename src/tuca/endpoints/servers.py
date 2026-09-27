@@ -38,6 +38,7 @@ class CreateServerRequest(BaseModel):
     hostname: str
     name: str
     publicPortFirewallIds: list[str]
+    userData: str | None = None
     volume: Volume
 
 
@@ -68,6 +69,7 @@ class Servers(Endpoint[Server]):
         sshkey_id: str,
         firewall: str,
         wait_until_active: bool = False,
+        user_data: str | None = None,
     ) -> Server:
         if flavor_id not in self.client.flavors.ids:
             raise CreateServerError(f"flavor not supported: {flavor_id}")
@@ -144,6 +146,7 @@ class Servers(Endpoint[Server]):
                 hostname=slugify(hostname if hostname else name),
                 name=name,
                 publicPortFirewallIds=[firewall_id],
+                userData=user_data,
                 volume=volume,
             )
         ):

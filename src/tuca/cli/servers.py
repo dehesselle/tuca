@@ -6,6 +6,7 @@ import argparse
 import platform
 import signal
 from enum import StrEnum, auto
+from pathlib import Path
 
 from tuca.cli.endpoint import list_resources
 from tuca.cli.output import to_str
@@ -37,6 +38,7 @@ def create_server(client: Client, args: argparse.Namespace):
         sshkey_id=args.sshkey,
         firewall=args.firewall,
         wait_until_active=args.wait,
+        user_data=args.userdata.read_text(encoding="utf-8") if args.userdata else None,
     )
     print(to_str(servers, [server]))
 
@@ -108,6 +110,13 @@ def add_command_servers(subparser: argparse._SubParsersAction):
     )
     password_or_sshkey.add_argument("--password", type=str, default="")
     password_or_sshkey.add_argument("--sshkey", type=str, default="")
+    server_action_create.add_argument(
+        "--userdata",
+        type=Path,
+        required=False,
+        default=None,
+        help="file with commands to run on first startup",
+    )
     server_action_create.add_argument(
         "--wait", action="store_true", default=False, help="wait until server is active"
     )

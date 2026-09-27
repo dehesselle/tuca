@@ -60,6 +60,6 @@ def main() -> None:
     except AttributeError:
         parser.print_usage()
         sys.exit(1)
-    except (AuthError, EndpointError) as e:
+    except (AuthError, EndpointError, OSError) as e:
         log.error(e)
         sys.exit(1)

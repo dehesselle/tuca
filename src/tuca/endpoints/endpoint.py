@@ -45,17 +45,17 @@ class HttpError(EndpointError):
 class Endpoint[T: Resource]:
     """base class for all endpoints"""
 
-    def __init__(self, resource_type: type[T], resource: str, client: Client):
+    def __init__(self, resource_type: type[T], resource_name: str, client: Client):
         self.client = client
         self.resources: list[T] = []
         self.resource_type = resource_type
-        self.resource = resource
-        self.response_key = resource
+        self.resource_name = resource_name
+        self.response_key = resource_name
 
     def _create(self, payload: BaseModel) -> list[T]:
         self.resources.clear()
         self.client.post(
-            self.resource,
+            self.resource_name,
             payload.model_dump(),
             headers={"Content-Type": "application/json"},
         )
@@ -64,7 +64,7 @@ class Endpoint[T: Resource]:
 
     def delete(self, id: str) -> Action | None:
         self.resources.clear()
-        self.client.delete(self.resource, id)
+        self.client.delete(self.resource_name, id)
         return self.client.action
 
     def delete_by_name(self, name: str) -> Action | None:
@@ -79,7 +79,7 @@ class Endpoint[T: Resource]:
 
     def get(self) -> list[T]:
         self.resources.clear()
-        self.client.get(self.resource)
+        self.client.get(self.resource_name)
         self.resources.extend(self._deserialize_resources(self.response_key))
         while self.client.next():  # pagination
             self.resources.extend(self._deserialize_resources(self.response_key))
@@ -87,7 +87,7 @@ class Endpoint[T: Resource]:
 
     def get_one(self, id: str) -> T | None:
         self.resources.clear()
-        self.client.get(f"{self.resource}/{id}")
+        self.client.get(f"{self.resource_name}/{id}")
         self.resources.extend(self._deserialize_resources())
         try:
             return self.resources[0]

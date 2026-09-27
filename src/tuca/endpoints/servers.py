@@ -169,9 +169,9 @@ class Servers(Endpoint[Server]):
             raise CreateServerError("failed to create server")
 
     def start(self, id: str) -> Action:
-        self.client.post(f"{self.resource}/{id}/start")
+        self.client.post(f"{self.resource_name}/{id}/start")
         return self._deserialize_action()
 
     def stop(self, id: str) -> Action:
-        self.client.post(f"{self.resource}/{id}/stop")
+        self.client.post(f"{self.resource_name}/{id}/stop")
         return self._deserialize_action()

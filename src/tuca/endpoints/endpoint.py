@@ -60,7 +60,12 @@ class Endpoint[T: Resource]:
         return next(iter(self._deserialize_resources()), None)
 
     def delete(self, id: str) -> Action | None:
-        return self.client.delete(self.resource_name, id)
+        action = self.client.delete(self.resource_name, id)
+        if self.client.is_status_not_found:
+            raise ResourceNotFoundError(f"resource id not found: {id}")
+        elif not self.client.is_status_ok:
+            raise self._http_error()
+        return action
 
     def delete_by_name(self, name: str) -> Action | None:
         if resource := self.get_one_by_name(name):
@@ -134,7 +139,7 @@ class Endpoint[T: Resource]:
             # not a breaking error here, needs to be handled upstream
             log.debug("resource(s) not found")
         else:
-            raise HttpError(f"HTTP status: {self.client.response.status_code}")
+            raise self._http_error()
         return result
 
     def _deserialize_action(self, key: str = "") -> Action:
@@ -157,8 +162,12 @@ class Endpoint[T: Resource]:
         elif self.client.is_status_not_found:
             raise ResourceNotFoundError("resource not found")
         else:
-            raise HttpError(f"HTTP status: {self.client.response.status_code}")
+            raise self._http_error()
         return action
+
+    def _http_error(self) -> HttpError:
+        response = self.client.response
+        return HttpError(f"HTTP status: {response.status_code} {response.text}".strip())
 
 
 def index_by_id[T: Resource](resources: list[T]) -> dict[str, T]:

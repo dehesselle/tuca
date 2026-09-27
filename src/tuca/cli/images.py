@@ -5,7 +5,6 @@
 import argparse
 from enum import StrEnum, auto
 
-from tuca.cli.auth import get_token
 from tuca.cli.endpoint import list_resources
 from tuca.client import Client
 
@@ -14,8 +13,8 @@ class Command(StrEnum):
     LIST = auto()
 
 
-def list_images(args: argparse.Namespace):
-    list_resources(Client(get_token(None)).images, args)
+def list_images(client: Client, args: argparse.Namespace):
+    list_resources(client.images, args)
 
 
 def add_command_images(subparser: argparse._SubParsersAction):

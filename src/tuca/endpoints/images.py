@@ -22,5 +22,5 @@ class Images(Endpoint[Image]):
        https://api.clouding.io/docs/#tag/Images
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Image, "images", client)

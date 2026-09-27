@@ -8,7 +8,7 @@ import sys
 
 from tuca.cli import output
 from tuca.cli.actions import add_command_actions
-from tuca.cli.auth import AuthError, add_auth_command
+from tuca.cli.auth import AuthError, add_auth_command, get_token
 from tuca.cli.cost import add_command_cost
 from tuca.cli.firewalls import add_command_firewalls
 from tuca.cli.flavors import add_command_flavors
@@ -17,6 +17,7 @@ from tuca.cli.keypairs import add_command_keypairs
 from tuca.cli.servers import add_command_servers
 from tuca.cli.snapshots import add_command_snapshots
 from tuca.cli.volumes import add_command_volumes
+from tuca.client import Client
 from tuca.endpoints.endpoint import EndpointError
 from tuca.log import setup_logging
 from tuca.version import VERSION
@@ -52,7 +53,10 @@ def main() -> None:
     output.be_verbose = args.verbose
 
     try:
-        args.func(args)
+        if getattr(args, "needs_client", True):
+            args.func(Client(get_token()), args)
+        else:
+            args.func(args)
     except AttributeError:
         parser.print_usage()
         sys.exit(1)

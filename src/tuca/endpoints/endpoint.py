@@ -46,15 +46,7 @@ class HttpError(EndpointError):
 class Endpoint[T: Resource]:
     """base class for all endpoints"""
 
-    def __init__(
-        self, resource_type: type[T], resource: str, client: Client | None = None
-    ):
-        # TODO: temporary fallback until every endpoint is created by Client
-        if client is None:
-            from tuca.cli.auth import get_token
-            from tuca.client import Client
-
-            client = Client(get_token(None))
+    def __init__(self, resource_type: type[T], resource: str, client: Client):
         self.client = client
         self.resources: list[T] = []
         self.resource_type = resource_type

@@ -22,6 +22,6 @@ class Firewalls(Endpoint[Firewall]):
        https://api.clouding.io/docs/#tag/Firewalls
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Firewall, "firewalls", client)
         self.response_key = "values"

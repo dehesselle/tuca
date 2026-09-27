@@ -21,7 +21,7 @@ class Volumes(Endpoint[VolumeSize]):
       https://api.clouding.io/docs/#tag/Sizes/operation/ListAllVolumeSizes
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(VolumeSize, "sizes/volumes", client)
         self.response_key = "volumeSizes"
 

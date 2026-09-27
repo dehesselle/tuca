@@ -5,7 +5,6 @@
 import argparse
 from enum import StrEnum, auto
 
-from tuca.cli.auth import get_token
 from tuca.cli.endpoint import list_resources
 from tuca.client import Client
 
@@ -14,8 +13,8 @@ class Command(StrEnum):
     LIST = auto()
 
 
-def list_actions(args: argparse.Namespace):
-    list_resources(Client(get_token(None)).actions, args)
+def list_actions(client: Client, args: argparse.Namespace):
+    list_resources(client.actions, args)
 
 
 def add_command_actions(subparser: argparse._SubParsersAction):

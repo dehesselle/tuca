@@ -23,7 +23,7 @@ class Keypairs(Endpoint[Keypair]):
        https://api.clouding.io/docs/#tag/SSH-Keys
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Keypair, "keypairs", client)
         self.response_key = "values"
 

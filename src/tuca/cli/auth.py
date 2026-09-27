@@ -34,7 +34,7 @@ def set_token(_) -> None:
         raise AuthError("no keyring available")
 
 
-def get_token(_) -> str:
+def get_token() -> str:
     if api_token := os.getenv(SERVICENAME):
         log.debug("auth via environment variable")
         return api_token
@@ -57,6 +57,8 @@ def delete_token(_) -> None:
 
 def add_auth_command(subparser: _SubParsersAction):
     auth = subparser.add_parser("auth", help="authentication")
+    # set_token / delete_token are client-less
+    auth.set_defaults(needs_client=False)
     auth_actions = auth.add_subparsers()
     auth_action_set = auth_actions.add_parser(Command.CREATE, help="set API token")
     auth_action_set.set_defaults(func=set_token)

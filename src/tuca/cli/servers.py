@@ -7,7 +7,6 @@ import platform
 import signal
 from enum import StrEnum, auto
 
-from tuca.cli.auth import get_token
 from tuca.cli.endpoint import list_resources
 from tuca.cli.output import to_str
 from tuca.client import Client
@@ -22,11 +21,11 @@ class Command(StrEnum):
     STOP = auto()
 
 
-def create_server(args: argparse.Namespace):
+def create_server(client: Client, args: argparse.Namespace):
     if args.wait and platform.system() == "Windows":
         signal.signal(signal.SIGINT, signal.SIG_DFL)  # make ctrl+c work
 
-    servers = Client(get_token(None)).servers
+    servers = client.servers
     server = servers.create(
         name=args.name,
         hostname=args.hostname,
@@ -42,8 +41,7 @@ def create_server(args: argparse.Namespace):
     print(to_str(servers, [server]))
 
 
-def delete_server(args: argparse.Namespace):
-    client = Client(get_token(None))
+def delete_server(client: Client, args: argparse.Namespace):
     if args.name:
         if action := client.servers.delete_by_name(args.name):
             print(to_str(client.actions, [action]))
@@ -51,12 +49,12 @@ def delete_server(args: argparse.Namespace):
         client.servers.delete(args.id)
 
 
-def list_servers(args: argparse.Namespace):
-    list_resources(Client(get_token(None)).servers, args)
+def list_servers(client: Client, args: argparse.Namespace):
+    list_resources(client.servers, args)
 
 
-def start_server(args: argparse.Namespace):
-    servers = Client(get_token(None)).servers
+def start_server(client: Client, args: argparse.Namespace):
+    servers = client.servers
     server = None
     if hasattr(args, "id") and args.id:
         server = servers.get_one(args.id)
@@ -69,8 +67,8 @@ def start_server(args: argparse.Namespace):
         raise ResourceNotFoundError("server not found")
 
 
-def stop_server(args: argparse.Namespace):
-    servers = Client(get_token(None)).servers
+def stop_server(client: Client, args: argparse.Namespace):
+    servers = client.servers
     server = None
     if hasattr(args, "id") and args.id:
         server = servers.get_one(args.id)

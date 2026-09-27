@@ -22,5 +22,5 @@ class Actions(Endpoint[Action]):
        https://api.clouding.io/docs/#tag/Actions
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Action, "actions", client)

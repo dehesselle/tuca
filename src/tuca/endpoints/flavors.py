@@ -21,7 +21,7 @@ class Flavors(Endpoint[Flavor]):
        https://api.clouding.io/docs/#tag/Sizes/operation/ListAllFlavors
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Flavor, "sizes/flavors", client)
         self.response_key = "flavors"
 

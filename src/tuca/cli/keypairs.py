@@ -5,7 +5,6 @@
 import argparse
 from enum import StrEnum, auto
 
-from tuca.cli.auth import get_token
 from tuca.cli.endpoint import list_resources
 from tuca.cli.output import to_str
 from tuca.client import Client
@@ -17,22 +16,21 @@ class Command(StrEnum):
     LIST = auto()
 
 
-def create_keypair(args: argparse.Namespace):
-    keypairs = Client(get_token(None)).keypairs
+def create_keypair(client: Client, args: argparse.Namespace):
+    keypairs = client.keypairs
     keypair = keypairs.create(args.name, args.publickey, args.privatekey)
     print(to_str(keypairs, [keypair] if keypair else []))
 
 
-def delete_keypair(args: argparse.Namespace):
-    client = Client(get_token(None))
+def delete_keypair(client: Client, args: argparse.Namespace):
     if args.name:
         client.keypairs.delete_by_name(args.name)
     else:
         client.keypairs.delete(args.id)
 
 
-def list_keypairs(args: argparse.Namespace):
-    list_resources(Client(get_token(None)).keypairs, args)
+def list_keypairs(client: Client, args: argparse.Namespace):
+    list_resources(client.keypairs, args)
 
 
 def add_command_keypairs(subparser: argparse._SubParsersAction):

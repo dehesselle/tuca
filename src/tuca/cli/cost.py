@@ -5,15 +5,14 @@
 import argparse
 import json
 
-from tuca.cli.auth import get_token
 from tuca.client import Client
 from tuca.cost import compute_hourly_cost
 
 
-def print_total_cost_per_hour(_) -> None:
+def print_total_cost_per_hour(client: Client, _) -> None:
     print(
         json.dumps(
-            {"cost": compute_hourly_cost(Client(get_token(None)))},
+            {"cost": compute_hourly_cost(client)},
             indent=4,
             sort_keys=True,
         )

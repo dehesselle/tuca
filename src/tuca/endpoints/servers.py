@@ -15,11 +15,6 @@ from tuca.resources.action import Action
 from tuca.resources.server import Server, Status
 
 from .endpoint import Endpoint, EndpointError
-from .firewalls import Firewalls
-from .flavors import Flavors
-from .images import Images
-from .snapshots import Snapshots
-from .volumes import Volumes
 
 if TYPE_CHECKING:
     from tuca.client import Client
@@ -58,7 +53,7 @@ class Servers(Endpoint[Server]):
        https://api.clouding.io/docs/#tag/Servers
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Server, "servers", client)
 
     def create(
@@ -74,12 +69,14 @@ class Servers(Endpoint[Server]):
         firewall: str,
         wait_until_active: bool = False,
     ) -> Server:
-        if flavor_id not in Flavors().all:
+        if flavor_id not in self.client.flavors.all:
             raise CreateServerError(f"flavor not supported: {flavor_id}")
 
         if firewall:
             if matched_firewalls := [
-                _ for _ in Firewalls().get() if firewall == _.id or firewall == _.name
+                _
+                for _ in self.client.firewalls.get()
+                if firewall == _.id or firewall == _.name
             ]:
                 if len(matched_firewalls) > 1:
                     raise CreateServerError(f"multiple firewalls matched: {firewall}")
@@ -90,12 +87,14 @@ class Servers(Endpoint[Server]):
         else:
             raise CreateServerError("firewall not specified")
 
-        if volume_ssdgb and volume_ssdgb not in Volumes().all:
+        if volume_ssdgb and volume_ssdgb not in self.client.volumes.all:
             raise CreateServerError(f"volume size not supported: {volume_ssdgb}")
 
         if snapshot:
             if matched_snapshots := [
-                _ for _ in Snapshots().get() if snapshot == _.id or snapshot == _.name
+                _
+                for _ in self.client.snapshots.get()
+                if snapshot == _.id or snapshot == _.name
             ]:
                 if len(matched_snapshots) > 1:
                     raise CreateServerError(f"multiple snapshots matched: {snapshot}")
@@ -109,7 +108,7 @@ class Servers(Endpoint[Server]):
                 raise CreateServerError(f"snapshot not found: {snapshot}")
         elif image:
             if matched_images := [
-                _ for _ in Images().get() if image == _.id or image == _.name
+                _ for _ in self.client.images.get() if image == _.id or image == _.name
             ]:
                 if len(matched_images) > 1:
                     raise CreateServerError(f"multiple images matched: {image}")

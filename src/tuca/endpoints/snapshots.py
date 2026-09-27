@@ -22,5 +22,5 @@ class Snapshots(Endpoint[Snapshot]):
        https://api.clouding.io/docs/#tag/Snapshots
     """
 
-    def __init__(self, client: Client | None = None):
+    def __init__(self, client: Client):
         super().__init__(Snapshot, "snapshots", client)

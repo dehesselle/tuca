@@ -9,13 +9,13 @@ import sys
 from tuca.cli.firewalls import add_command_firewalls
 from tuca.cli.flavors import add_command_flavors
 from tuca.cli.images import add_command_images
+from tuca.cli.keypairs import add_command_keypairs
 from tuca.cli.snapshots import add_command_snapshots
 from tuca.cli.volumes import add_command_volumes
 from tuca.clouding import AuthError, add_auth_command
 from tuca.cost import add_cost_command
 from tuca.endpoints.actions import add_actions_command
 from tuca.endpoints.endpoint import Endpoint, EndpointError
-from tuca.endpoints.keypairs import add_keypairs_command
 from tuca.endpoints.servers import add_servers_command
 from tuca.log import setup_logging
 from tuca.version import VERSION
@@ -42,7 +42,7 @@ def main() -> None:
     add_command_firewalls(commands)
     add_command_flavors(commands)
     add_command_images(commands)
-    add_keypairs_command(commands)
+    add_command_keypairs(commands)
     add_servers_command(commands)
     add_command_snapshots(commands)
     add_command_volumes(commands)

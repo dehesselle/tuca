@@ -6,13 +6,17 @@ import argparse
 import json
 
 from tuca.client import Client
-from tuca.cost import compute_hourly_cost
 
 
 def print_total_cost_per_hour(client: Client, _) -> None:
+    cost = {
+        "servers": client.servers.hourly_cost(),
+        "snapshots": client.snapshots.hourly_cost(),
+    }
+    cost["total"] = sum(cost.values())
     print(
         json.dumps(
-            {"cost": compute_hourly_cost(client)},
+            {"cost": cost},
             indent=4,
             sort_keys=True,
         )

@@ -14,7 +14,7 @@ from slugify import slugify
 from tuca.resources.action import Action
 from tuca.resources.server import Server, Status
 
-from .endpoint import Endpoint, EndpointError
+from .endpoint import Endpoint, EndpointError, index_by_id
 
 if TYPE_CHECKING:
     from tuca.client import Client
@@ -182,3 +182,12 @@ class Servers(Endpoint[Server]):
     def stop(self, id: str) -> Action:
         self.client.post(f"{self.resource_name}/{id}/stop")
         return self._deserialize_action()
+
+    def hourly_cost(self) -> float:
+        """cost of all servers, flavors and images combined"""
+        flavors = index_by_id(self.client.flavors.get())
+        images = index_by_id(self.client.images.get())
+        return sum(
+            flavors[server.flavor].pricePerHour + images[server.image.id].pricePerHour
+            for server in self.get()
+        )

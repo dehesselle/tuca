@@ -51,9 +51,10 @@ class Client:
        https://api.clouding.io/docs/#section/Introduction
     """
 
-    def __init__(self, token: str):
+    def __init__(self, token: str, timeout: int = 30):
         self.base_url = "https://api.clouding.io/v1"
         self.authentication = {"X-API-KEY": token}
+        self.timeout = timeout  # seconds, per request
         self.resource = ""
         self.response = requests.Response()
         self.response_header = ResponseHeader()
@@ -74,6 +75,7 @@ class Client:
             f"{self.base_url}/{resource}",
             params={"pageSize": self.response_page_size},
             headers=self.authentication,
+            timeout=self.timeout,
         )
         self._process_response()
 
@@ -85,14 +87,19 @@ class Client:
         self.resource = resource
         headers.update(self.authentication)
         self.response = requests.post(
-            f"{self.base_url}/{resource}", data=json.dumps(payload), headers=headers
+            f"{self.base_url}/{resource}",
+            data=json.dumps(payload),
+            headers=headers,
+            timeout=self.timeout,
         )
         self._process_response()
 
     def delete(self, resource: str, id: str) -> Action | None:
         self.resource = resource
         self.response = requests.delete(
-            f"{self.base_url}/{resource}/{id}", headers=self.authentication
+            f"{self.base_url}/{resource}/{id}",
+            headers=self.authentication,
+            timeout=self.timeout,
         )
         action = (
             Action.model_validate(self.response.json()) if self.has_content else None
@@ -102,7 +109,9 @@ class Client:
 
     def next(self) -> bool:
         if url := self.pagination.links.next:
-            self.response = requests.get(url, headers=self.authentication)
+            self.response = requests.get(
+                url, headers=self.authentication, timeout=self.timeout
+            )
             self._process_response()
             return True
         else:

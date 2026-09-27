@@ -26,6 +26,6 @@ class Volumes(Endpoint[VolumeSize]):
         self.response_key = "volumeSizes"
 
     @property
-    def all(self) -> list[int]:
+    def sizes(self) -> list[int]:
         self.get()
         return [volumesize.sizeGb for volumesize in self.resources]

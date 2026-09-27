@@ -87,7 +87,7 @@ class Servers(Endpoint[Server]):
         else:
             raise CreateServerError("firewall not specified")
 
-        if volume_ssdgb and volume_ssdgb not in self.client.volumes.all:
+        if volume_ssdgb and volume_ssdgb not in self.client.volumes.sizes:
             raise CreateServerError(f"volume size not supported: {volume_ssdgb}")
 
         if snapshot:

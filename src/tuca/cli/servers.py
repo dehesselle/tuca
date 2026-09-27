@@ -9,6 +9,7 @@ from enum import StrEnum, auto
 
 from tuca.cli.auth import get_token
 from tuca.cli.endpoint import list_resources
+from tuca.cli.output import to_str
 from tuca.client import Client
 from tuca.endpoints.endpoint import ResourceNotFoundError
 
@@ -38,14 +39,14 @@ def create_server(args: argparse.Namespace):
         firewall=args.firewall,
         wait_until_active=args.wait,
     )
-    print(servers.to_str([server]))
+    print(to_str(servers, [server]))
 
 
 def delete_server(args: argparse.Namespace):
     client = Client(get_token(None))
     if args.name:
         if action := client.servers.delete_by_name(args.name):
-            print(client.actions.to_str([action]))
+            print(to_str(client.actions, [action]))
     else:
         client.servers.delete(args.id)
 

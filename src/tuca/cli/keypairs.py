@@ -7,6 +7,7 @@ from enum import StrEnum, auto
 
 from tuca.cli.auth import get_token
 from tuca.cli.endpoint import list_resources
+from tuca.cli.output import to_str
 from tuca.client import Client
 
 
@@ -19,7 +20,7 @@ class Command(StrEnum):
 def create_keypair(args: argparse.Namespace):
     keypairs = Client(get_token(None)).keypairs
     keypair = keypairs.create(args.name, args.publickey, args.privatekey)
-    print(keypairs.to_str([keypair] if keypair else []))
+    print(to_str(keypairs, [keypair] if keypair else []))
 
 
 def delete_keypair(args: argparse.Namespace):

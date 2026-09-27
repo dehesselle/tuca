@@ -4,20 +4,21 @@
 
 import argparse
 
+from tuca.cli.output import to_str
 from tuca.endpoints.endpoint import Endpoint
 
 
 def list_resources(endpoint: Endpoint, args: argparse.Namespace):
     if hasattr(args, "id") and args.id:
         if endpoint.get_one(args.id):
-            print(endpoint.to_str())
+            print(to_str(endpoint))
         else:
-            print(endpoint.to_str())
+            print(to_str(endpoint))
     elif hasattr(args, "name") and args.name:
         resource = endpoint.get_one_by_name(args.name)
-        print(endpoint.to_str([resource] if resource else []))
+        print(to_str(endpoint, [resource] if resource else []))
     elif hasattr(args, "filter") and args.filter:
-        print(endpoint.to_str(endpoint.find(args.filter)))
+        print(to_str(endpoint, endpoint.find(args.filter)))
     else:
         endpoint.get()
-        print(endpoint.to_str())
+        print(to_str(endpoint))

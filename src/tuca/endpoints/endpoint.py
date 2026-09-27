@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from typing import TYPE_CHECKING, cast
 
@@ -46,8 +45,6 @@ class HttpError(EndpointError):
 
 class Endpoint[T: Resource]:
     """base class for all endpoints"""
-
-    be_verbose: bool = False
 
     def __init__(
         self, resource_type: type[T], resource: str, client: Client | None = None
@@ -131,28 +128,6 @@ class Endpoint[T: Resource]:
                 and filter.lower() in cast(NamedResource, resource).name.lower()
             )
         ]
-
-    def _to_str(self, resources: dict) -> str:
-        if self.be_verbose:
-            resources["header"] = {  # pyright: ignore[reportArgumentType]
-                "status_code": self.client.response.status_code,
-            }
-            resources["header"].update(self.client.response_header.model_dump())
-
-        return json.dumps(
-            resources,
-            indent=4,
-            sort_keys=True,
-        )
-
-    def to_str(self, resources: list[T] | None = None) -> str:
-        resources_dict = {
-            str(self.resource): [
-                resource.to_dict(self.be_verbose)
-                for resource in (resources or self.resources)
-            ]
-        }
-        return self._to_str(resources_dict)
 
     def _deserialize_resources(self, key: str = "") -> list[T]:
         result = []

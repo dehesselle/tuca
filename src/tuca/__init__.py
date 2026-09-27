@@ -6,6 +6,7 @@ import argparse
 import logging
 import sys
 
+from tuca.cli import output
 from tuca.cli.actions import add_command_actions
 from tuca.cli.auth import AuthError, add_auth_command
 from tuca.cli.cost import add_command_cost
@@ -16,7 +17,7 @@ from tuca.cli.keypairs import add_command_keypairs
 from tuca.cli.servers import add_command_servers
 from tuca.cli.snapshots import add_command_snapshots
 from tuca.cli.volumes import add_command_volumes
-from tuca.endpoints.endpoint import Endpoint, EndpointError
+from tuca.endpoints.endpoint import EndpointError
 from tuca.log import setup_logging
 from tuca.version import VERSION
 
@@ -48,7 +49,7 @@ def main() -> None:
     add_command_volumes(commands)
 
     args = parser.parse_args()
-    Endpoint.be_verbose = args.verbose
+    output.be_verbose = args.verbose
 
     try:
         args.func(args)

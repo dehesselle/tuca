@@ -6,6 +6,7 @@ import argparse
 import logging
 import sys
 
+from tuca.cli.actions import add_command_actions
 from tuca.cli.firewalls import add_command_firewalls
 from tuca.cli.flavors import add_command_flavors
 from tuca.cli.images import add_command_images
@@ -14,7 +15,6 @@ from tuca.cli.snapshots import add_command_snapshots
 from tuca.cli.volumes import add_command_volumes
 from tuca.clouding import AuthError, add_auth_command
 from tuca.cost import add_cost_command
-from tuca.endpoints.actions import add_actions_command
 from tuca.endpoints.endpoint import Endpoint, EndpointError
 from tuca.endpoints.servers import add_servers_command
 from tuca.log import setup_logging
@@ -36,7 +36,7 @@ def main() -> None:
     )
     parser.add_argument("--version", action="version", version=f"tuca {VERSION}")
     commands = parser.add_subparsers(help="available commands")
-    add_actions_command(commands)
+    add_command_actions(commands)
     add_auth_command(commands)
     add_cost_command(commands)
     add_command_firewalls(commands)

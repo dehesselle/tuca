@@ -2,23 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import argparse
-from enum import StrEnum, auto
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from tuca.resources.action import Action
 
-from .endpoint import Endpoint, list_resources
+from .endpoint import Endpoint
 
-
-class Command(StrEnum):
-    LIST = auto()
-
-
-class Status(StrEnum):
-    COMPLETED = auto()
-    ERRORED = auto()
-    IN_PROGRESS = "inProgress"
-    PENDING = auto()
+if TYPE_CHECKING:
+    from tuca.client import Client
 
 
 class Actions(Endpoint[Action]):
@@ -29,19 +22,5 @@ class Actions(Endpoint[Action]):
        https://api.clouding.io/docs/#tag/Actions
     """
 
-    def __init__(self):
-        super().__init__(Action, "actions")
-
-
-def list_actions(args: argparse.Namespace):
-    list_resources(Actions(), args)
-
-
-def add_actions_command(subparser: argparse._SubParsersAction):
-    actions = subparser.add_parser("actions", help="long-running actions")
-    snapshot_actions = actions.add_subparsers(help="available commands")
-    snapshot_action_list = snapshot_actions.add_parser(
-        Command.LIST, help="list actions"
-    )
-    snapshot_action_list.add_argument("--id", type=str, default="", required=False)
-    snapshot_action_list.set_defaults(func=list_actions)
+    def __init__(self, client: Client | None = None):
+        super().__init__(Action, "actions", client)

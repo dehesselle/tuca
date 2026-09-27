@@ -7,6 +7,8 @@ from __future__ import annotations
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING
 
+from tuca.endpoints.endpoint import index_by_id
+
 if TYPE_CHECKING:
     from tuca.client import Client
 
@@ -30,9 +32,11 @@ def compute_hourly_cost(client: Client) -> dict[str, float]:
         Expense.TOTAL.value: 0.0,
     }
 
+    flavors = index_by_id(client.flavors.get())
+    images = index_by_id(client.images.get())
     for server in client.servers.get():
-        cost[Expense.SERVERS] += client.flavors.by_id[server.flavor].pricePerHour
-        cost[Expense.IMAGES] += client.images.by_id[server.image.id].pricePerHour
+        cost[Expense.SERVERS] += flavors[server.flavor].pricePerHour
+        cost[Expense.IMAGES] += images[server.image.id].pricePerHour
     for snapshot in client.snapshots.get():
         cost[Expense.SNAPSHOTS] += snapshot.cost.pricePerHour
 

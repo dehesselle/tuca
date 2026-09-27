@@ -24,11 +24,8 @@ def _to_str(endpoint: Endpoint, resources: dict) -> str:
     )
 
 
-def to_str[T: Resource](endpoint: Endpoint[T], resources: list[T] | None = None) -> str:
+def to_str[T: Resource](endpoint: Endpoint[T], resources: list[T]) -> str:
     resources_dict = {
-        endpoint.resource_name: [
-            resource.to_dict(be_verbose)
-            for resource in (resources or endpoint.resources)
-        ]
+        endpoint.resource_name: [resource.to_dict(be_verbose) for resource in resources]
     }
     return _to_str(endpoint, resources_dict)

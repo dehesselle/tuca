@@ -47,23 +47,19 @@ class Endpoint[T: Resource]:
 
     def __init__(self, resource_type: type[T], resource_name: str, client: Client):
         self.client = client
-        self.resources: list[T] = []
         self.resource_type = resource_type
         self.resource_name = resource_name
         self.response_key = resource_name
 
-    def _create(self, payload: BaseModel) -> list[T]:
-        self.resources.clear()
+    def _create(self, payload: BaseModel) -> T | None:
         self.client.post(
             self.resource_name,
             payload.model_dump(),
             headers={"Content-Type": "application/json"},
         )
-        self.resources.extend(self._deserialize_resources())
-        return self.resources
+        return next(iter(self._deserialize_resources()), None)
 
     def delete(self, id: str) -> Action | None:
-        self.resources.clear()
         self.client.delete(self.resource_name, id)
         return self.client.action
 
@@ -78,19 +74,16 @@ class Endpoint[T: Resource]:
     # with its query() and query_one() methods.
 
     def get(self) -> list[T]:
-        self.resources.clear()
         self.client.get(self.resource_name)
-        self.resources.extend(self._deserialize_resources(self.response_key))
+        resources = self._deserialize_resources(self.response_key)
         while self.client.next():  # pagination
-            self.resources.extend(self._deserialize_resources(self.response_key))
-        return self.resources
+            resources.extend(self._deserialize_resources(self.response_key))
+        return resources
 
     def get_one(self, id: str) -> T | None:
-        self.resources.clear()
         self.client.get(f"{self.resource_name}/{id}")
-        self.resources.extend(self._deserialize_resources())
         try:
-            return self.resources[0]
+            return self._deserialize_resources()[0]
         except IndexError:
             log.debug(f"resource id not found: {id}")
             return None
@@ -99,17 +92,12 @@ class Endpoint[T: Resource]:
         # The API does not support requesting a single resource
         # by name, so we have to request them all and then
         # select the one we want.
-        try:
-            return self.by_name[name]
-        except KeyError:
-            return None
+        return index_by_name(self.get()).get(name)
 
     def find(self, filter: str) -> list[T]:
-        if not self.resources:
-            self.get()
         return [
             resource
-            for resource in self.resources
+            for resource in self.get()
             if (
                 hasattr(resource, "id")
                 and filter.lower() in cast(IdentifiableResource, resource).id.lower()
@@ -153,7 +141,7 @@ class Endpoint[T: Resource]:
     def _deserialize_action(self, key: str = "") -> Action:
         if self.client.is_status_ok:
             try:
-                self.action = Action.model_validate(
+                action = Action.model_validate(
                     self.client.response.json()[key]
                     if key
                     else self.client.response.json()
@@ -171,23 +159,12 @@ class Endpoint[T: Resource]:
             raise ResourceNotFoundError("resource not found")
         else:
             raise HttpError(f"HTTP status: {self.client.response.status_code}")
-        return self.action
+        return action
 
-    @property
-    def by_id(
-        self,
-    ) -> dict[str, T]:
-        if not self.resources:
-            self.get()
-        return {
-            cast(IdentifiableResource, resource).id: resource
-            for resource in self.resources
-        }
 
-    @property
-    def by_name(self) -> dict[str, T]:
-        if not self.resources:
-            self.get()
-        return {
-            cast(NamedResource, resource).name: resource for resource in self.resources
-        }
+def index_by_id[T: Resource](resources: list[T]) -> dict[str, T]:
+    return {cast(IdentifiableResource, resource).id: resource for resource in resources}
+
+
+def index_by_name[T: Resource](resources: list[T]) -> dict[str, T]:
+    return {cast(NamedResource, resource).name: resource for resource in resources}

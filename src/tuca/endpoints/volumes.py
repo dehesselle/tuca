@@ -27,5 +27,4 @@ class Volumes(Endpoint[VolumeSize]):
 
     @property
     def sizes(self) -> list[int]:
-        self.get()
-        return [volumesize.sizeGb for volumesize in self.resources]
+        return [volumesize.sizeGb for volumesize in self.get()]

@@ -27,5 +27,4 @@ class Flavors(Endpoint[Flavor]):
 
     @property
     def ids(self) -> list[str]:
-        self.get()
-        return [flavor.id for flavor in self.resources]
+        return [flavor.id for flavor in self.get()]

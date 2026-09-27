@@ -137,7 +137,7 @@ class Servers(Endpoint[Server]):
         else:
             raise CreateServerError("missing mandatory option: {password,sshkey}")
 
-        self._create(
+        if server := self._create(
             CreateServerRequest(
                 accessConfiguration=access_configuration,
                 flavorId=flavor_id,
@@ -146,25 +146,32 @@ class Servers(Endpoint[Server]):
                 publicPortFirewallIds=[firewall_id],
                 volume=volume,
             )
-        )
-
-        if self.resources:
+        ):
             if wait_until_active:
                 with ThreadPoolExecutor() as executor:
 
-                    def wait(servers: Servers, status: Status, seconds: int) -> None:
-                        while server := servers.get_one(servers.resources[0].id):
-                            if server.status == status:
+                    def wait(
+                        servers: Servers,
+                        requested_server: Server,
+                        status: Status,
+                        seconds: int,
+                    ) -> Server:
+                        while server := servers.get_one(requested_server.id):
+                            requested_server = server
+                            if requested_server.status == status:
                                 break
                             time.sleep(seconds)
+                        return requested_server
 
-                    future = executor.submit(wait, self, Status.ACTIVE, 15)
+                    task = executor.submit(wait, self, server, Status.ACTIVE, 15)
                     try:
-                        future.result(timeout=300)
+                        task.result(timeout=300)
                     except TimeoutError:
-                        future.cancel()
+                        task.cancel()
+                if not task.cancelled():  # leaving the executor waited for it
+                    server = task.result()
 
-            return self.resources[0]
+            return server
         else:
             raise CreateServerError("failed to create server")
 

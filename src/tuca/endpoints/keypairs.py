@@ -33,10 +33,7 @@ class Keypairs(Endpoint[Keypair]):
         payload = CreateKeypairRequest(
             name=name, publicKey=public_key, privateKey=private_key
         )
-        try:
-            return self._create(payload)[0]
-        except IndexError:
-            return None
+        return self._create(payload)
 
 
 class CreateKeypairRequest(BaseModel):

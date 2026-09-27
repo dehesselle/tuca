@@ -4,6 +4,7 @@
 
 import argparse
 import logging
+import sys
 
 from tuca.clouding import AuthError, add_auth_command
 from tuca.cost import add_cost_command
@@ -53,7 +54,7 @@ def main() -> None:
         args.func(args)
     except AttributeError:
         parser.print_usage()
-        exit(1)
+        sys.exit(1)
     except (AuthError, EndpointError) as e:
         log.error(e)
-        exit(1)
+        sys.exit(1)

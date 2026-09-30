@@ -76,7 +76,7 @@ class Server(NamedResource):
     )
     createdAt: str = Field(default="", json_schema_extra=SERIALIZE_ALWAYS)
     dnsAddress: str | None = None
-    features: list[str] = []
+    features: list[str] = Field(default_factory=list)
     flavor: str
     hostname: str
     image: ServerImageInfo
@@ -89,4 +89,4 @@ class Server(NamedResource):
     status: Status = Field(json_schema_extra=SERIALIZE_ALWAYS)
     vCores: float
     volumeSizeGb: int
-    vpcPorts: list[VpcPortDescriptor] = []
+    vpcPorts: list[VpcPortDescriptor] = Field(default_factory=list)

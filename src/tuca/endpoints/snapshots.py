@@ -24,7 +24,3 @@ class Snapshots(Endpoint[Snapshot]):
 
     def __init__(self, client: Client):
         super().__init__(Snapshot, "snapshots", client)
-
-    def hourly_cost(self) -> float:
-        """cost of all snapshots"""
-        return sum(snapshot.cost.pricePerHour for snapshot in self.get())

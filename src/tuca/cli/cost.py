@@ -10,8 +10,8 @@ from tuca.client import Client
 
 def print_total_cost_per_hour(client: Client, _) -> None:
     cost = {
-        "servers": client.servers.hourly_cost(),
-        "snapshots": client.snapshots.hourly_cost(),
+        "servers": client.cost.servers(),
+        "snapshots": client.cost.snapshots(),
     }
     cost["total"] = sum(cost.values())
     print(

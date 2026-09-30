@@ -8,6 +8,7 @@ from http import HTTPStatus
 
 import requests
 
+from tuca.cost import Cost
 from tuca.endpoints.actions import Actions
 from tuca.endpoints.firewalls import Firewalls
 from tuca.endpoints.flavors import Flavors
@@ -68,6 +69,7 @@ class Client:
         self.servers = Servers(self)
         self.snapshots = Snapshots(self)
         self.volumes = Volumes(self)
+        self.cost = Cost(self)
 
     def get(self, resource: str):
         self.resource = resource
